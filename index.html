@@ -475,14 +475,14 @@ async function quickUpload(){
       fd2.append('action','processEntry');
       fd2.append('entry',entry);
       fd2.append('nowDt',NOW_DT);
-      const noteResp=await fetch(getEndpoint(),{method:'POST',body:fd2,redirect:'follow'});
+      const noteResp=await fetch(getEndpoint()+'?'+fd2.toString(),{method:'GET',redirect:'follow'});
       const noteData=await noteResp.json();
       if(noteData.success) logResult=noteData.result;
       else logResult={error:noteData.error||'Failed'};
       if(logResult&&logResult.tabs&&logResult.tabs.length){
         const payload=logResult.tabs.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
         const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-        await fetch(getEndpoint(),{method:'POST',body:fd,redirect:'follow'});
+        await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
       }
     }catch(err){logResult={error:err.message};}
   }
@@ -529,7 +529,7 @@ async function processAnalyze(){
       fd3.append('mimeType',mimeType);
       fd3.append('nowDt',NOW_DT);
       fd3.append('analyzeMode',uploadMode==='analyze'?'1':'0');
-      const docResp=await fetch(getEndpoint(),{method:'POST',body:fd3,redirect:'follow'});
+      const docResp=await fetch(getEndpoint()+'?'+fd3.toString(),{method:'GET',redirect:'follow'});
       const docData=await docResp.json();
       if(!docData.success) throw new Error(docData.error||'Server error');
       const logResult=docData.result;
@@ -582,7 +582,7 @@ async function commitAnalyze(){
         try{
           const payload=sel.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
           const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-          const resp=await fetch(getEndpoint(),{method:'POST',body:fd,redirect:'follow'});
+          const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
           const data=await resp.json();
           if(data.success)data.results.forEach(r2=>{html+=`<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border);padding:6px 10px"><i class="ti ti-circle-check" style="color:var(--green-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--green-text)">${escH(r2.tab)} — row added</span></div>`;});
           else throw new Error(data.error||'Write failed');
@@ -613,11 +613,11 @@ async function processText(){
   hide('mode-text');show('processing');
   $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields · Mapping to tabs';
   try{
-    const fd=new URLSearchParams();
-    fd.append('action','processEntry');
-    fd.append('entry',entry);
-    fd.append('nowDt',NOW_DT);
-    const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
+    const params=new URLSearchParams();
+    params.append('action','processEntry');
+    params.append('entry',entry);
+    params.append('nowDt',NOW_DT);
+    const resp=await fetch(ep+'?'+params.toString(),{method:'GET',redirect:'follow'});
     const data=await resp.json();
     if(!data.success) throw new Error(data.error||'Server error');
     lastTextResult=data.result;
@@ -653,7 +653,7 @@ async function commitTextEntry(){
     const sel=lastTextResult.tabs.filter((_,i)=>$(`txt-tab-${i}`)&&$(`txt-tab-${i}`).checked);
     const payload=sel.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
     const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-    const resp=await fetch(getEndpoint(),{method:'POST',body:fd,redirect:'follow'});
+    const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
     const data=await resp.json();
     const statusEl=$('write-status');statusEl.style.display='';
     if(data.success){
@@ -701,7 +701,7 @@ async function toBase64(file){return new Promise((res,rej)=>{const r=new FileRea
 async function uploadToDrive(meta){
   const fd=new URLSearchParams();fd.append('action','driveUpload');fd.append('folderId',DRIVE_FOLDER_ID);
   Object.entries(meta).forEach(([k,v])=>fd.append(k,v||''));
-  const resp=await fetch(getEndpoint(),{method:'POST',body:fd,redirect:'follow'});
+  const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
   return await resp.json();
 }
 
