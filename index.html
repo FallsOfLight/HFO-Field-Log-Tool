@@ -131,16 +131,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="card" id="config-card">
     <p class="section-label">Owner setup — one time per device</p>
     <div class="config-row">
-      <input type="password" class="config-input" id="apikey-input" placeholder="Anthropic API key  sk-ant-..." autocomplete="off">
-      <button class="btn-ghost" onclick="saveConfig()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Save</button>
-    </div>
-    <div class="config-row">
       <input type="text" class="config-input" id="endpoint-input" placeholder="Apps Script URL  https://script.google.com/macros/s/.../exec" autocomplete="off" style="font-size:11px">
+      <button class="btn-ghost" onclick="saveConfig()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Save</button>
     </div>
     <div class="config-row">
       <input type="password" class="config-input" id="pin-setup-input" placeholder="Set field PIN — share with subs" autocomplete="off" style="font-size:13px">
     </div>
-    <p class="config-note" id="config-status">Enter API key + Apps Script URL + PIN then Save. <a href="https://console.anthropic.com" target="_blank" style="color:var(--amber)">Get API key</a></p>
+    <p class="config-note" id="config-status">Enter Apps Script URL + PIN then Save.</p>
   </div>
 
   <!-- PIN gate -->
@@ -308,32 +305,9 @@ const TODAY=new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'
 const NOWTIME=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
 const NOW_DT=TODAY+' '+NOWTIME;
 
-const SYS_LOG=`You are the HFO auto-logger. Hidden Falls Operations - Jay Gray / Owner-GC | 50189 Hidden Falls Rd, Oakhurst CA 93644. Pre-Construction phase. Now: ${NOW_DT}. Next sequence numbers: TXN-010 | PMT-004 | DOC-034 | BID-016. Float: ~$20,000 | HML: $158,175 unfunded.
+// SYS_LOG moved to Apps Script server-side
 
-KNOWN CONTACTS - do NOT add Contacts & Subs rows for these, reference CS number only:
-CS-047 Torres Plumbing | CS-096 Sandlot | CS-097 Wellco Pump | CS-098 CV Truss Inc. (David Campos) | CS-099 NexGen Steel | CS-100 Technicon (Melissa Chico) | CS-101 Home Depot ProDesk | CS-102 Sees Consulting (Esther) | CS-103 Chicago Title (Cyd) | CS-104 Dustin Perry - Paralegal | CS-105 RW Construction (Ryan Wright) | CS-106 Fulce Engineering (Brian Fulce) | CS-107 Sees Consulting (James Lorenzo) | CS-108 Associated Design & Engineering (Terry Moore) | CS-109 Hannah Reyes - Drafts | CS-110 Jonathan Davis - Private Lender | CS-111 Jonathan Gray - Private Lender | CS-112 Central Valley Reinforcing (Victor Zamora) | CS-113 WholesaleCabinets (Kevin Grasser) | CS-114 Isaiah Industries (Todd Miller) | CS-115 84 Lumber (Andrew Lopez) | CS-116 Raven Millworks | CS-117 Sandlot Construction | CS-118 Technicon (Adam) | CS-119 Deal/Salem.net | CS-120 Grant Richards - Tree Trimming 559-332-6052 | CS-032 Jacob Salazar | CS-044 Frank Raney | CS-063 Sierra Fire | CS-026 Jesus Tellez
-
-CONTACTS & SUBS RULES:
-- Check KNOWN CONTACTS above first. If person or company is listed, skip Contacts & Subs tab entirely.
-- Only create a new Contacts & Subs row for people genuinely not in the list above.
-- New contacts start at CS-121 and increment sequentially.
-- Never create duplicate contact rows under any circumstances.
-- Contact Name field must be FIRST NAME LAST NAME order (e.g. "Grant Richards" not "Richards Grant"). Always correct reversed names.
-- The Contact ID field key must be EXACTLY "Contact ID" — never "CS #", never "ID", never "cs_id". Use the assigned CS-### value as the value.
-- Example correct Contacts & Subs row: {"Contact ID":"CS-121","Company Name":"Acme Co","Contact Name":"John Smith","Trade / Specialty":"Plumbing","Phone":"559-555-1234","Email":"","Status":"Lead","Last Contact Date":"07/02/2026","Quote Received?":"No","Quote Amount":"","Priority":"High","Notes":"Met on site.","Bid Amount ($)":"","Hourly Rate ($)":"","Labor & Materials":"Labor Only"}
-
-VALID TAB NAMES: Daily Log | Payment Ledger | HML Banking & Draws | Document Log | Bid Log | Project Milestones | Contacts & Subs
-
-ROUTING: Site visit/work/meetings/photos -> Daily Log only. Payment -> Daily Log + Payment Ledger + HML Banking & Draws. New bid -> Daily Log + Bid Log. Genuinely new person not in known contacts -> Daily Log + Contacts & Subs. New document -> Daily Log + Document Log. Milestone -> Daily Log + Project Milestones.
-
-DAILY LOG - all 25 cols required, dash for unknown:
-Date (use ${NOW_DT} — include time) | Day # | Phase | Entry Type | Who On Site | Weather | Temp (F) | Work Start | Work End | Hours Worked | Draw # | Materials Used | Mat Cost ($) | Labor Cost ($) | Vendor/Sub Paid | Lien Waiver | Inspection | Insp Result | Safety Issue | Issue/Delay | Work Completed | Next Steps | Photo Log | Doc Ref | Flag
-
-Flag=Y if follow-up needed. Lien waiver required before payment — flag CRITICAL if missing.
-CRITICAL JSON RULES: Return ONLY a raw JSON object, nothing before { or after }. No markdown. No literal newlines inside string values. Parentheses and apostrophes are fine. If unsure about a value use a dash.
-{"summary":"one sentence","tabs":[{"tab":"exact tab name","action":"Add row","row":{"Column":"value"}}],"flags":[{"severity":"critical|warning|info","message":"text"}]}`;
-
-const SYS_PHOTO=`You are a construction site photo analyst for HFO (Hidden Falls Operations). Analyze the photo and return a brief structured report. Note what work is visible, what stage it appears to be at, any visible safety or quality concerns, materials visible, and notable site conditions. Under 120 words. Plain text only, no JSON, no headers.`;
+// SYS_PHOTO moved to Apps Script server-side
 
 // ── STATE ────────────────────────────────────────────────────
 let fileQueue=[],queueResults=[],lastTextResult=null,uploadMode='quick',mode='text';
@@ -342,12 +316,11 @@ let isOwnerDevice=false;
 const $=id=>document.getElementById(id);
 const show=id=>{const el=$(id);if(el)el.style.display='';};
 const hide=id=>{const el=$(id);if(el)el.style.display='none';};
-function getKey(){return localStorage.getItem('hfo_apikey')||'';}
+// getKey removed — API key now lives in Apps Script only
 
 // ── CONFIG ───────────────────────────────────────────────────
 function saveConfig(){
-  const k=$('apikey-input').value.trim(),ep=$('endpoint-input').value.trim(),pin=$('pin-setup-input').value.trim();
-  if(k)localStorage.setItem('hfo_apikey',k);
+  const ep=$('endpoint-input').value.trim(),pin=$('pin-setup-input').value.trim();
   if(ep)localStorage.setItem('hfo_endpoint',ep);
   if(pin)localStorage.setItem('hfo_pin',pin);
   localStorage.setItem('hfo_owner_device','1');
@@ -359,22 +332,20 @@ function checkPin(){
   if(entered===stored){hide('pin-gate');show('mode-tabs');show('mode-text');}
   else{$('pin-status').textContent='Incorrect PIN.';$('pin-status').style.color='var(--red-text)';}
 }
-function getEndpoint(){return localStorage.getItem('hfo_endpoint')||APPS_SCRIPT_URL;}
+function getEndpoint(){return localStorage.getItem('hfo_endpoint')||'';}
 function updateConfigStatus(){
-  const k=getKey(),ep=localStorage.getItem('hfo_endpoint'),s=$('config-status');
-  if(k&&ep){s.innerHTML='<span class="saved-dot"></span>Ready';$('config-card').style.borderColor='var(--green-border)';}
-  else if(k){s.innerHTML='<span class="saved-dot" style="background:var(--amber)"></span>API key saved — add Apps Script URL';}
-  else{s.innerHTML='Enter API key + Apps Script URL + PIN then Save.';}
+  const ep=localStorage.getItem('hfo_endpoint'),s=$('config-status');
+  if(ep){s.innerHTML='<span class="saved-dot"></span>Ready';$('config-card').style.borderColor='var(--green-border)';}
+  else{s.innerHTML='Enter Apps Script URL + PIN then Save.';}
 }
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     const ol=document.getElementById('loading-overlay');
     if(ol){ol.classList.add('hide');setTimeout(()=>ol.remove(),450);}
   },600);
-  const k=getKey(),ep=localStorage.getItem('hfo_endpoint'),pin=localStorage.getItem('hfo_pin');
+  const ep=localStorage.getItem('hfo_endpoint'),pin=localStorage.getItem('hfo_pin');
   isOwnerDevice=!!localStorage.getItem('hfo_owner_device');
   if(isOwnerDevice){
-    if(k)$('apikey-input').value='••••••••••••••••';
     if(ep)$('endpoint-input').value=ep;
     if(pin)$('pin-setup-input').value='........';
     updateConfigStatus();
@@ -499,9 +470,15 @@ async function quickUpload(){
     $('proc-label').textContent='Logging field notes...';$('proc-sub').textContent='Writing to Daily Log';
     try{
       const fileList=results.map(r=>r.filename).join(', ');
-      const entry=fieldNotes+'\n\nUploaded by: '+vendor+'\nFiles: '+fileList+'\nFile type: '+(getFileTypeLabel()||'doc');
-      const raw=await callClaude([{role:'user',content:'Log this HFO site entry:\n\n'+entry}],SYS_LOG);
-      logResult=safeParseJSON(raw);
+      const entry=fieldNotes+' Uploaded by: '+vendor+' Files: '+fileList+' File type: '+(getFileTypeLabel()||'doc');
+      const fd2=new URLSearchParams();
+      fd2.append('action','processEntry');
+      fd2.append('entry',entry);
+      fd2.append('nowDt',NOW_DT);
+      const noteResp=await fetch(getEndpoint(),{method:'POST',body:fd2,redirect:'follow'});
+      const noteData=await noteResp.json();
+      if(noteData.success) logResult=noteData.result;
+      else logResult={error:noteData.error||'Failed'};
       if(logResult&&logResult.tabs&&logResult.tabs.length){
         const payload=logResult.tabs.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
         const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
@@ -546,11 +523,17 @@ async function processAnalyze(){
     try{
       const b64=await toBase64(item.file);const mimeType=item.file.type||'image/jpeg';
       const isPDF=item.file.type==='application/pdf';
-      const block=isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:mimeType,data:b64}};
-      let aiNotes=null;
-      if(!isPDF)aiNotes=await callClaude([{role:'user',content:[block,{type:'text',text:'Analyze this construction site photo.'}]}],SYS_PHOTO);
-      const logRaw=await callClaude([{role:'user',content:[block,{type:'text',text:'Process this HFO document and return log entries.'}]}],SYS_LOG);
-      const logResult=safeParseJSON(logRaw);
+      const fd3=new URLSearchParams();
+      fd3.append('action','processDoc');
+      fd3.append('base64',b64);
+      fd3.append('mimeType',mimeType);
+      fd3.append('nowDt',NOW_DT);
+      fd3.append('analyzeMode',uploadMode==='analyze'?'1':'0');
+      const docResp=await fetch(getEndpoint(),{method:'POST',body:fd3,redirect:'follow'});
+      const docData=await docResp.json();
+      if(!docData.success) throw new Error(docData.error||'Server error');
+      const logResult=docData.result;
+      const aiNotes=docData.aiNotes||null;
       queueResults.push({file:item.file,exif:item.exif,b64,mimeType,vendor,aiNotes,logResult,filename:buildFilename(item.file.name,vendor)});
     }catch(err){queueResults.push({file:item.file,error:err.message});}
   }
@@ -616,8 +599,7 @@ async function fetchNextCS(){
   try{
     const ep=getEndpoint();
     if(!ep) return 'CS-121';
-    const fd=new URLSearchParams();fd.append('action','getNextCS');
-    const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
+    const resp=await fetch(ep+'?action=getNextCS',{method:'GET',redirect:'follow'});
     const data=await resp.json();
     return data.success?data.nextCS:'CS-121';
   }catch(e){return 'CS-121';}
@@ -626,13 +608,19 @@ async function fetchNextCS(){
 async function processText(){
   const entry=$('entry-text').value.trim();if(!entry){$('entry-text').focus();return;}
   const savedEntry=entry;
+  const ep=getEndpoint();
+  if(!ep){alert('No Apps Script URL — enter it in setup.');return;}
   hide('mode-text');show('processing');
   $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields · Mapping to tabs';
   try{
-    const nextCS=await fetchNextCS();
-    const sysLog=SYS_LOG.replace('New contacts start at CS-112','New contacts start at '+nextCS);
-    const raw=await callClaude([{role:'user',content:'Log this HFO site entry:\n\n'+entry}],sysLog);
-    lastTextResult=safeParseJSON(raw);
+    const fd=new URLSearchParams();
+    fd.append('action','processEntry');
+    fd.append('entry',entry);
+    fd.append('nowDt',NOW_DT);
+    const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
+    const data=await resp.json();
+    if(!data.success) throw new Error(data.error||'Server error');
+    lastTextResult=data.result;
     if(!lastTextResult.tabs||!lastTextResult.tabs.length){
       hide('processing');show('mode-text');$('entry-text').value=savedEntry;
       alert('No log entries extracted. Add more detail and try again.');return;
@@ -709,13 +697,7 @@ function safeParseJSON(raw){
 
 // ── API + DRIVE ───────────────────────────────────────────────
 async function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
-async function callClaude(messages,sys){
-  const key=getKey();if(!key)throw new Error('No API key — open Setup on owner device');
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,system:sys,messages})});
-  const data=await resp.json();
-  if(data.error)throw new Error(data.error.message);
-  return data.content.map(b=>b.text||'').join('');
-}
+// callClaude removed — all AI calls now route through Apps Script server-side
 async function uploadToDrive(meta){
   const fd=new URLSearchParams();fd.append('action','driveUpload');fd.append('folderId',DRIVE_FOLDER_ID);
   Object.entries(meta).forEach(([k,v])=>fd.append(k,v||''));
