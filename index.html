@@ -101,14 +101,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span class="hdr-title">HFO Log Entry</span>
       <span class="badge" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)">Pre-Construction</span>
     </div>
-    <p class="hdr-sub">50189 Hidden Falls Rd · Oakhurst CA · Jay Gray / GC</p>
+    <p class="hdr-sub">50189 Hidden Falls Rd - Oakhurst CA - Jay Gray / GC</p>
   </div>
 
   <div class="card" id="config-card">
     <p class="section-label">Setup — one time</p>
     <div id="owner-setup">
       <div class="config-row">
-        <input type="password" class="config-input" id="apikey-input" placeholder="Anthropic API key  sk-ant-... (doc/photo uploads only)" autocomplete="off">
+        <input type="password" class="config-input" id="apikey-input" placeholder="Anthropic API key  sk-ant-..." autocomplete="off">
         <button class="btn-ghost" onclick="saveConfig()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Save</button>
       </div>
       <div class="config-row">
@@ -152,7 +152,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
       <i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i>
       <p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Drop or tap to upload</p>
-      <p style="font-size:11px;color:var(--text2);margin:0">Invoice · Lien Waiver · Bid · Permit · Receipt · Site Photo</p>
+      <p style="font-size:11px;color:var(--text2);margin:0">Invoice - Lien Waiver - Bid - Permit - Receipt - Site Photo</p>
       <input id="file-input" type="file" accept="image/*,.pdf" style="display:none">
     </div>
 
@@ -287,8 +287,12 @@ async function uploadToDrive(meta){
   formData.append('action','driveUpload');
   formData.append('folderId',DRIVE_FOLDER_ID);
   Object.entries(meta).forEach(([k,v])=>formData.append(k,v||''));
-  const resp=await fetch(ep,{method:'POST',body:formData,redirect:'follow'});
-  return await resp.json();
+  // no-cors: Apps Script never sends CORS headers, so a normal fetch always shows a
+  // false "blocked" error even though the upload succeeds server-side. no-cors tells
+  // the browser not to attempt reading the response, which stops the false error -
+  // but it also means we genuinely cannot read back success/fileUrl anymore.
+  await fetch(ep,{method:'POST',mode:'no-cors',body:formData});
+  return {sentNoCors:true};
 }
 
 const TAB_COLS={
@@ -467,17 +471,11 @@ async function callClaude(messages){
   return JSON.parse(text.replace(/```json|```/g,'').trim());
 }
 
-// Text entries no longer call Anthropic from the browser at all - Apps Script does it
-// server-side with a key from Script Properties. Key never touches this device.
+// Text entries call Anthropic directly - this is the one endpoint that can actually
+// return a response the browser can read (Anthropic supports CORS for this; Apps Script never can).
+// Key stays in the browser for now - see chat for the real fix (serverless proxy) when ready to scale that.
 async function callClaudeServerSide(entryText){
-  const ep=getEndpoint();if(!ep) throw new Error('No Apps Script URL configured');
-  const fd=new URLSearchParams();
-  fd.append('action','processEntry');
-  fd.append('entry',entryText);
-  const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
-  const data=await resp.json();
-  if(data.success===false) throw new Error(data.error||'Processing failed');
-  return data;
+  return await callClaude([{role:'user',content:'Log this HFO site entry:\n\n'+entryText}]);
 }
 
 async function processText(){
@@ -504,7 +502,7 @@ async function processDoc(){
 
 async function writeToSheets(){
   const ep=getEndpoint();if(!ep){alert('No Apps Script URL');return;}
-  const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Writing...';
+  const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Sending...';
   try{
     const payload=lastResult.tabs.map(tab=>{
       const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);
@@ -512,39 +510,45 @@ async function writeToSheets(){
       return {tab:rt,row};
     });
     const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-    const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
-    renderWriteResults(await resp.json());
+    // no-cors: Apps Script can't send CORS headers back, so a normal fetch always
+    // shows a false "failed" error even when the write succeeds server-side.
+    // This mode stops the false error but also means we can't read back which rows
+    // landed - the honest message below reflects that.
+    await fetch(ep,{method:'POST',mode:'no-cors',body:fd});
+    renderWriteResults({sentNoCors:true, tabCount:payload.length});
   }catch(err){
+    // Only a genuine network failure reaches here now (offline, DNS, bad URL) - not CORS.
     btn.disabled=false;btn.innerHTML='<i class="ti ti-table-import"></i> Write to Google Sheets';
     $('write-status').style.display='';
-    $('write-status').innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Write failed: '+escH(err.message)+'</span></div>';
+    $('write-status').innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Send failed: '+escH(err.message)+'</span></div>';
   }
 }
 
 async function saveToDrive(){
   if(!lastFile||!lastFileB64) return;
-  const btn=$('drive-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Saving to Drive...';
+  const btn=$('drive-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Sending to Drive...';
   try{
     const vendor=$('vendor-name').value.trim();
     const filename=buildFilename(lastFile.name);
     const gps=lastExif&&lastExif.gps?lastExif.gps:null;
     const manualSite=$('manual-site')?$('manual-site').value.trim():'';
-    const result=await uploadToDrive({filename,mimeType:lastFileType,base64:lastFileB64,vendorName:vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:lastExif&&lastExif.datetime?lastExif.datetime:'',manualSite,uploadedAt:new Date().toISOString()});
-    if(result&&result.success){
-      btn.innerHTML='<i class="ti ti-circle-check"></i> Saved to Drive';btn.style.background='var(--green)';
-      const el=$('drive-status');el.style.display='';
-      el.innerHTML='<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border)"><i class="ti ti-folder-check" style="color:var(--green-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--green-text);margin:0 0 2px">Saved to Site_Receipts_Vendors</p><p style="font-size:11px;color:var(--text2);margin:0;font-family:monospace">'+escH(filename)+'</p>'+(result.fileUrl?'<a href="'+result.fileUrl+'" target="_blank" style="font-size:11px;color:var(--blue-text);display:inline-flex;align-items:center;gap:3px;margin-top:6px"><i class="ti ti-external-link" style="font-size:11px"></i> Open in Drive</a>':'')+'</div></div>';
-    } else throw new Error(result&&result.error?result.error:'Upload failed');
+    await uploadToDrive({filename,mimeType:lastFileType,base64:lastFileB64,vendorName:vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:lastExif&&lastExif.datetime?lastExif.datetime:'',manualSite,uploadedAt:new Date().toISOString()});
+    btn.innerHTML='<i class="ti ti-circle-check"></i> Sent to Drive';btn.style.background='var(--amber)';
+    const el=$('drive-status');el.style.display='';
+    el.innerHTML='<div class="write-result" style="background:var(--amber-bg);border:1px solid var(--amber-border)"><i class="ti ti-folder-check" style="color:var(--amber-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--amber-text);margin:0 0 2px">Sent to Site_Receipts_Vendors</p><p style="font-size:11px;color:var(--text2);margin:0;font-family:monospace">'+escH(filename)+'</p><p style="font-size:11px;color:var(--text2);margin:6px 0 0">Apps Script can\'t confirm back to the browser - verify the file landed.</p><a href="https://drive.google.com/drive/folders/1IFwSn0n-LW55AZ00b01-LRG6h0ya8rbP" target="_blank" style="font-size:11px;color:var(--blue-text);display:inline-flex;align-items:center;gap:3px;margin-top:6px"><i class="ti ti-external-link" style="font-size:11px"></i> Open Drive folder</a></div></div>';
   }catch(err){
     btn.disabled=false;btn.innerHTML='<i class="ti ti-brand-google-drive"></i> Save to Drive';
     const el=$('drive-status');el.style.display='';
-    el.innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Drive save failed: '+escH(err.message)+'</span></div>';
+    el.innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Send failed: '+escH(err.message)+'</span></div>';
   }
 }
 
 function renderWriteResults(data){
   const el=$('write-status');el.style.display='';let h='';
-  if(data.success&&data.results){
+  if(data.sentNoCors){
+    h+='<div class="write-result" style="background:var(--amber-bg);border:1px solid var(--amber-border)"><i class="ti ti-send" style="color:var(--amber-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--amber-text);margin:0 0 4px">Sent ('+data.tabCount+' tab'+(data.tabCount!==1?'s':'')+')</p><p style="font-size:11px;color:var(--text2);margin:0">Apps Script can\'t confirm back to the browser - verify the row landed.</p><a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:10px"><i class="ti ti-external-link" style="font-size:13px"></i> Open sheet to verify</a></div></div>';
+    const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-circle-check"></i> Sent';btn.style.background='var(--amber)';
+  } else if(data.success&&data.results){
     const allOk=data.results.every(r=>r.success),col=allOk?'green':'amber';
     h+='<div class="write-result" style="background:var(--'+col+'-bg);border:1px solid var(--'+col+'-border)"><i class="ti '+(allOk?'ti-circle-check':'ti-alert-circle')+'" style="color:var(--'+col+'-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--'+col+'-text);margin:0 0 8px">'+(allOk?'Written to sheets':'Partial write')+'</p><div>';
     data.results.forEach(r=>{h+='<div class="tab-write-row"><span style="color:var(--text2)">'+escH(r.tab)+'</span><span style="color:'+(r.success?'var(--green-text)':'var(--red-text)')+';font-weight:500">'+(r.success?'Row '+(r.row||'added'):''+escH(r.error||'failed'))+'</span></div>';});
