@@ -8,9 +8,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f2f2f2;--card:#ffffff;--card2:#e8e8e8;
-  --text:#1a1917;--text2:#5a5a5a;--text3:#909090;
-  --border:#d8d8d8;--border2:#c0c0c0;
+  --bg:#f7f5f0;--card:#fff;--card2:#f0ede8;
+  --text:#1a1917;--text2:#6b6860;--text3:#a09890;
+  --border:#e2ddd6;--border2:#ccc8be;
   --amber:#b35c00;--amber-bg:#fef3e2;--amber-border:#f0c060;--amber-text:#92610a;
   --red:#8b2020;--red-bg:#fdf2f2;--red-border:#f0a0a0;--red-text:#8b2020;
   --green:#1a5c1a;--green-bg:#eef7ee;--green-border:#90c890;--green-text:#1a5c1a;
@@ -41,14 +41,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .config-input{flex:1;font-size:12px;padding:7px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:monospace}
 .config-input:focus{outline:none;border-color:var(--amber)}
 .config-note{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.config-note a{color:var(--amber);text-decoration:none}
 .saved-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle}
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card2);border-radius:var(--rs);padding:3px;margin-bottom:1rem}
-.mode-tab{padding:9px;text-align:center;font-size:15px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s}
-.mode-tab.active{background:var(--amber);color:#fff;border:1px solid var(--amber);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.mode-tab{padding:8px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s}
+.mode-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border)}
 .entry-area{width:100%;min-height:140px;font-size:14px;padding:10px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--card2);color:var(--text);resize:vertical;font-family:inherit;line-height:1.6}
 .entry-area:focus{outline:none;border-color:var(--amber)}
 .entry-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
-.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1.5rem 1rem;text-align:center;cursor:pointer;background:var(--card2);transition:all 0.15s;margin-bottom:0.75rem}
+.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1.75rem 1rem;text-align:center;cursor:pointer;background:var(--card2);transition:all 0.15s}
 .drop-zone:hover,.drop-zone.drag{border-color:var(--amber);background:var(--amber-bg)}
 .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--amber);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:0.75rem}
 .btn-primary:hover{opacity:0.88}
@@ -56,6 +57,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-write{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:0.5rem}
 .btn-write:hover{opacity:0.88}
 .btn-write:disabled{opacity:0.35;cursor:not-allowed}
+.btn-drive{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:0.5rem}
+.btn-drive:hover{opacity:0.88}
+.btn-drive:disabled{opacity:0.35;cursor:not-allowed}
 .btn-ghost{background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer}
 .btn-ghost:hover{background:var(--card2)}
 .btn-copy{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap}
@@ -75,48 +79,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .write-result{border-radius:var(--rs);padding:10px 14px;font-size:13px;display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
 .tab-write-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
 .tab-write-row:last-child{border-bottom:none}
-.upload-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:0.75rem}
+.upload-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:0.75rem;display:none}
 .check-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .check-row:last-of-type{border-bottom:none}
 .check-row input[type=checkbox]{width:17px;height:17px;margin-top:2px;accent-color:var(--amber);cursor:pointer;flex-shrink:0}
-.check-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.4}
+.check-label{font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
 .check-sub{font-size:11px;color:var(--text2);margin-top:2px}
 .text-input-full{width:100%;font-size:13px;padding:8px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:inherit;margin-top:6px}
 .text-input-full:focus{outline:none;border-color:var(--amber)}
-.gps-strip{border-radius:var(--rs);padding:8px 12px;font-size:11px;display:flex;align-items:flex-start;gap:8px;margin-top:8px}
+.gps-strip{border-radius:var(--rs);padding:8px 12px;font-size:11px;display:flex;align-items:flex-start;gap:8px;margin-top:10px}
 .gps-ok{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green-text)}
+.gps-warn{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber-text)}
 .gps-none{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red-text)}
-.file-queue{margin-bottom:0.75rem}
-.file-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:4px;font-size:12px}
-.file-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.file-item-status{font-size:11px;color:var(--text3);flex-shrink:0}
-.file-item.done .file-item-status{color:var(--green-text)}
-.file-item.error .file-item-status{color:var(--red-text)}
-.file-remove{background:none;border:none;color:var(--text3);cursor:pointer;padding:2px 4px;font-size:13px;flex-shrink:0}
-.upload-toggle{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card2);border-radius:var(--rs);padding:3px;margin-bottom:0.75rem}
-.upload-toggle-btn{padding:7px;text-align:center;font-size:14px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s;line-height:1.3}
-.upload-toggle-btn.active{background:var(--amber);color:#fff;border:1px solid var(--amber);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
-.review-section{border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;overflow:hidden}
-.review-section-header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card2);border-bottom:1px solid var(--border)}
-.review-section-header label{display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;font-size:13px;font-weight:500}
-.review-section-header input[type=checkbox]{width:16px;height:16px;accent-color:var(--amber);cursor:pointer;flex-shrink:0}
-.review-section-body{padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6}
-.ai-notes{font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap}
-.loading-overlay{position:fixed;inset:0;background:#f2f2f2;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.4s ease}
-.loading-overlay.hide{opacity:0;pointer-events:none}
-.loading-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em}
-.loading-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
-.loading-bar-wrap{width:160px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.loading-bar{height:100%;width:0%;background:var(--amber);border-radius:2px;animation:loadprogress 1.8s ease-out forwards}
-@keyframes loadprogress{0%{width:0%}60%{width:75%}100%{width:100%}}
 </style>
 </head>
 <body>
-<div id="loading-overlay" class="loading-overlay">
-  <div class="loading-title">HFO Field Log</div>
-  <div class="loading-sub">Hidden Falls Operations · Loading...</div>
-  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-</div>
 <div class="shell">
 
   <div class="hdr">
@@ -127,23 +104,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p class="hdr-sub">50189 Hidden Falls Rd · Oakhurst CA · Jay Gray / GC</p>
   </div>
 
-  <!-- Config — owner device only -->
   <div class="card" id="config-card">
-    <p class="section-label">Owner setup — one time per device</p>
-    <div class="config-row">
-      <input type="text" class="config-input" id="endpoint-input" placeholder="Apps Script URL  https://script.google.com/macros/s/.../exec" autocomplete="off" style="font-size:11px">
-      <button class="btn-ghost" onclick="saveConfig()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Save</button>
+    <p class="section-label">Setup — one time</p>
+    <div id="owner-setup">
+      <div class="config-row">
+        <input type="password" class="config-input" id="apikey-input" placeholder="Anthropic API key  sk-ant-... (doc/photo uploads only)" autocomplete="off">
+        <button class="btn-ghost" onclick="saveConfig()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Save</button>
+      </div>
+      <div class="config-row">
+        <input type="text" class="config-input" id="endpoint-input" placeholder="Apps Script URL  https://script.google.com/macros/s/.../exec" autocomplete="off" style="font-size:11px">
+      </div>
+      <div class="config-row">
+        <input type="password" class="config-input" id="pin-setup-input" placeholder="Set field PIN (share this with subs/inspectors)" autocomplete="off" style="font-size:13px">
+      </div>
     </div>
-    <div class="config-row">
-      <input type="password" class="config-input" id="pin-setup-input" placeholder="Set field PIN — share with subs" autocomplete="off" style="font-size:13px">
-    </div>
-    <p class="config-note" id="config-status">Enter Apps Script URL + PIN then Save.</p>
+    <p class="config-note" id="config-status">Enter API key + Apps Script URL + field PIN then hit Save. <a href="https://console.anthropic.com" target="_blank">Get API key</a></p>
   </div>
 
-  <!-- PIN gate -->
   <div class="card" id="pin-gate" style="display:none">
     <p class="section-label">Field access</p>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Enter site PIN to log an entry</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Enter your site PIN to log an entry</p>
     <div class="config-row">
       <input type="password" class="config-input" id="pin-input" placeholder="Site PIN" autocomplete="off" style="font-size:18px;letter-spacing:4px;text-align:center">
       <button class="btn-ghost" onclick="checkPin()" style="white-space:nowrap;padding:7px 12px;font-size:12px">Enter</button>
@@ -151,78 +131,71 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p class="config-note" id="pin-status">Contact Jay Gray for your PIN.</p>
   </div>
 
-  <!-- Mode tabs -->
-  <div class="mode-tabs" id="mode-tabs">
+  <div class="mode-tabs">
     <button class="mode-tab active" id="tab-text" onclick="setMode('text')"><i class="ti ti-pencil"></i> Type entry</button>
-    <button class="mode-tab" id="tab-doc" onclick="setMode('doc')"><i class="ti ti-file-upload"></i> <strong>Upload Docs & Images</strong></button>
+    <button class="mode-tab" id="tab-doc" onclick="setMode('doc')"><i class="ti ti-file-upload"></i> Upload doc</button>
   </div>
 
-  <!-- TEXT MODE -->
   <div id="mode-text">
     <div class="card" style="padding:0.875rem 1.25rem">
       <p class="section-label">Site event / log entry</p>
       <textarea class="entry-area" id="entry-text" placeholder="Talk naturally. Who, what, when, costs, next steps."></textarea>
       <p class="entry-hint">Include date if not today. Claude handles all formatting and tab routing.</p>
+      <div id="text-gps-strip" style="display:none;margin-top:10px"></div>
     </div>
-    <button class="btn-primary" onclick="processText()"><i class="ti ti-cpu"></i> Process entry</button>
+    <button class="btn-primary" id="process-text-btn" onclick="processText()">
+      <i class="ti ti-cpu"></i> Process entry
+    </button>
   </div>
 
-  <!-- DOC MODE -->
   <div id="mode-doc" style="display:none">
-    <div class="upload-toggle">
-      <button class="upload-toggle-btn active" id="utoggle-quick" onclick="setUploadMode('quick')">
-        <i class="ti ti-bolt" style="font-size:14px"></i><br>Quick Upload
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">Field / phone</div>
-      </button>
-      <button class="upload-toggle-btn" id="utoggle-analyze" onclick="setUploadMode('analyze')">
-        <i class="ti ti-cpu" style="font-size:14px"></i><br>Log &amp; Analyze (slow)
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">Desk / AI review</div>
-      </button>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i>
+      <p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Drop or tap to upload</p>
+      <p style="font-size:11px;color:var(--text2);margin:0">Invoice · Lien Waiver · Bid · Permit · Receipt · Site Photo</p>
+      <input id="file-input" type="file" accept="image/*,.pdf" style="display:none">
     </div>
 
-    <div class="upload-meta">
-      <p class="section-label" id="meta-label">Step 1 — Who &amp; what</p>
+    <div class="upload-meta" id="upload-meta">
+      <p class="section-label">Before you upload</p>
+
       <div style="margin-bottom:12px">
-        <label style="font-size:14px;font-weight:700;color:var(--text);display:block;margin-bottom:4px">Vendor / Uploader name <span style="color:var(--red-text)">*</span></label>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Vendor / Uploader name <span style="color:var(--red-text)">*</span></label>
         <input type="text" class="text-input-full" id="vendor-name" placeholder="e.g. Torres Plumbing, Jacob Salazar, Jay Gray">
       </div>
-      <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">What are these files? <span style="color:var(--red-text)">*</span></p>
+
+      <p style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px">What is this file? <span style="color:var(--red-text)">*</span></p>
       <div class="check-row">
         <input type="checkbox" id="chk-workphoto" onchange="onTypeCheck('workphoto')">
         <div>
-          <div class="check-label"><i class="ti ti-camera" style="font-size:12px"></i> Work photo / site image</div>
+          <div class="check-label"><i class="ti ti-camera" style="font-size:13px"></i> Work photo / site image</div>
           <div class="check-sub">Progress photos, site conditions, installed work, inspections</div>
         </div>
       </div>
       <div class="check-row" style="border-bottom:none">
         <input type="checkbox" id="chk-receipt" onchange="onTypeCheck('receipt')">
         <div>
-          <div class="check-label"><i class="ti ti-receipt" style="font-size:12px"></i> Receipt / financial document</div>
+          <div class="check-label"><i class="ti ti-receipt" style="font-size:13px"></i> Receipt / financial document</div>
           <div class="check-sub">Invoice, receipt, bid, lien waiver, payment confirmation</div>
         </div>
       </div>
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-        <label style="font-size:14px;font-weight:700;color:var(--text);display:block;margin-bottom:4px">
-          <i class="ti ti-notes" style="font-size:13px"></i> Field notes
-          <span style="font-size:12px;font-weight:400;color:var(--text3);margin-left:4px">— what was done, any issues</span>
-        </label>
-        <textarea class="entry-area" id="field-notes" style="min-height:80px;font-size:13px" placeholder="Quick note: work done, issues, materials, who was on site..."></textarea>
-        <p style="font-size:11px;color:var(--text3);margin-top:4px">Optional. Auto-logged to Daily Log with your upload.</p>
+
+      <div id="gps-strip" style="display:none"></div>
+
+      <div id="manual-site-wrap" style="display:none;margin-top:10px">
+        <label style="font-size:12px;font-weight:600;color:var(--red-text);display:block;margin-bottom:4px"><i class="ti ti-map-pin-off" style="font-size:12px"></i> No GPS found in file — enter job site <span style="color:var(--red-text)">*</span></label>
+        <input type="text" class="text-input-full" id="manual-site" placeholder="e.g. Hidden Falls Rd Oakhurst, Gate Area, Shop">
+        <p style="font-size:11px;color:var(--text3);margin-top:4px">Required when GPS is missing. Be specific.</p>
+      </div>
+
+      <div id="filename-preview" style="display:none;margin-top:12px;padding:8px 10px;background:var(--card2);border-radius:var(--rs);border:1px solid var(--border)">
+        <p style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Filename in Drive</p>
+        <p id="filename-text" style="font-size:11px;color:var(--text);font-family:monospace;word-break:break-all"></p>
       </div>
     </div>
 
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      <i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i>
-      <p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Step 2 — Tap to select files</p>
-      <p style="font-size:11px;color:var(--text2);margin:0">One or multiple — JPG, PNG, PDF</p>
-      <input id="file-input" type="file" accept="image/*,.pdf" multiple style="display:none">
-    </div>
-
-    <div class="file-queue" id="file-queue" style="display:none"></div>
-    <div id="gps-warnings" style="display:none"></div>
-
-    <button class="btn-primary" id="process-doc-btn" style="display:none" onclick="handleDocAction()">
-      <i class="ti ti-bolt"></i> <span id="process-btn-label">Upload to Drive</span>
+    <button class="btn-primary" id="process-doc-btn" style="display:none" onclick="processDoc()">
+      <i class="ti ti-cpu"></i> Process document
     </button>
   </div>
 
@@ -240,48 +213,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 </div>
 <script>
-// ── HARDCODED CONFIG ─────────────────────────────────────────
-const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbzmQtkUDbw3dJE09DrfcWSr8ZifaDNM3Eu73oOqf6UbmMLMKJUFWvM7SyUpayVdiW1L/exec';
-const DRIVE_FOLDER_ID='1IFwSn0n-LW55AZ00b01-LRG6h0ya8rbP';
-
-// ── EXIF GPS ─────────────────────────────────────────────────
+// EXIF GPS parser
 function readExifGPS(file){
   return new Promise(resolve=>{
     if(!file.type.startsWith('image/')){resolve(null);return;}
     const reader=new FileReader();
     reader.onload=e=>{
       try{
-        const buf=e.target.result,view=new DataView(buf);
+        const buf=e.target.result;
+        const view=new DataView(buf);
         if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
         let offset=2;
         while(offset<buf.byteLength-2){
           const marker=view.getUint16(offset);
           if(marker===0xFFE1){
-            if(String.fromCharCode(...new Uint8Array(buf,offset+4,4))!=='Exif'){resolve(null);return;}
-            const to=offset+10,bo=view.getUint16(to),le=bo===0x4949;
-            const r16=(o)=>le?view.getUint16(to+o,true):view.getUint16(to+o,false);
-            const r32=(o)=>le?view.getUint32(to+o,true):view.getUint32(to+o,false);
-            const ifd0=r32(4),ne=r16(ifd0);
-            let gpsOff=null,dt=null;
-            for(let i=0;i<ne;i++){const eo=ifd0+2+i*12,tag=r16(eo);
-              if(tag===0x8825)gpsOff=r32(eo+8);
-              if(tag===0x9003){const so=r32(eo+8);let s='';for(let c=0;c<20;c++){const ch=view.getUint8(to+so+c);if(ch===0)break;s+=String.fromCharCode(ch);}dt=s;}
+            const exifHeader=String.fromCharCode(...new Uint8Array(buf,offset+4,4));
+            if(exifHeader!=='Exif'){resolve(null);return;}
+            const tiffOffset=offset+10;
+            const byteOrder=view.getUint16(tiffOffset);
+            const le=byteOrder===0x4949;
+            const r16=(o)=>le?view.getUint16(tiffOffset+o,true):view.getUint16(tiffOffset+o,false);
+            const r32=(o)=>le?view.getUint32(tiffOffset+o,true):view.getUint32(tiffOffset+o,false);
+            const ifd0=r32(4);
+            const numEntries=r16(ifd0);
+            let gpsIFDOffset=null,dtOrig=null;
+            for(let i=0;i<numEntries;i++){
+              const eo=ifd0+2+i*12;
+              const tag=r16(eo);
+              if(tag===0x8825) gpsIFDOffset=r32(eo+8);
+              if(tag===0x9003){
+                const strOffset=r32(eo+8);
+                let s='';
+                for(let c=0;c<20;c++){const ch=view.getUint8(tiffOffset+strOffset+c);if(ch===0)break;s+=String.fromCharCode(ch);}
+                dtOrig=s;
+              }
             }
-            if(!gpsOff){resolve({gps:null,datetime:dt});return;}
-            const ge=r16(gpsOff),rat=(o)=>{const n=r32(o),d=r32(o+4);return d?n/d:0;};
-            let lat=null,lon=null,latR='',lonR='',gd=null;
-            for(let i=0;i<ge;i++){const eo=gpsOff+2+i*12,tag=r16(eo),vo=to+r32(eo+8);
-              if(tag===0x0001)latR=String.fromCharCode(view.getUint8(to+r32(eo+8)));
-              if(tag===0x0002)lat=rat(vo)+rat(vo+8)/60+rat(vo+16)/3600;
-              if(tag===0x0003)lonR=String.fromCharCode(view.getUint8(to+r32(eo+8)));
-              if(tag===0x0004)lon=rat(vo)+rat(vo+8)/60+rat(vo+16)/3600;
-              if(tag===0x001D){let s='';for(let c=0;c<11;c++){const ch=view.getUint8(to+r32(eo+8)+c);if(ch===0)break;s+=String.fromCharCode(ch);}gd=s;}
+            if(!gpsIFDOffset){resolve({gps:null,datetime:dtOrig});return;}
+            const gpsEntries=r16(gpsIFDOffset);
+            const rational=(o)=>{const n=r32(o);const d=r32(o+4);return d?n/d:0;};
+            let lat=null,lon=null,latRef='',lonRef='',gpsDate=null;
+            for(let i=0;i<gpsEntries;i++){
+              const eo=gpsIFDOffset+2+i*12;
+              const tag=r16(eo);
+              const valOff=tiffOffset+r32(eo+8);
+              if(tag===0x0001) latRef=String.fromCharCode(view.getUint8(tiffOffset+r32(eo+8)));
+              if(tag===0x0002) lat=rational(valOff)+rational(valOff+8)/60+rational(valOff+16)/3600;
+              if(tag===0x0003) lonRef=String.fromCharCode(view.getUint8(tiffOffset+r32(eo+8)));
+              if(tag===0x0004) lon=rational(valOff)+rational(valOff+8)/60+rational(valOff+16)/3600;
+              if(tag===0x001D){let s='';for(let c=0;c<11;c++){const ch=view.getUint8(tiffOffset+r32(eo+8)+c);if(ch===0)break;s+=String.fromCharCode(ch);}gpsDate=s;}
             }
-            if(lat===null||lon===null){resolve({gps:null,datetime:dt});return;}
-            if(latR==='S')lat=-lat;if(lonR==='W')lon=-lon;
-            resolve({gps:{lat:lat.toFixed(6),lon:lon.toFixed(6)},datetime:dt||gd});return;
-          } else if((marker&0xFF00)===0xFF00){offset+=2+view.getUint16(offset+2);}
-          else break;
+            if(lat===null||lon===null){resolve({gps:null,datetime:dtOrig});return;}
+            if(latRef==='S') lat=-lat;
+            if(lonRef==='W') lon=-lon;
+            resolve({gps:{lat:lat.toFixed(6),lon:lon.toFixed(6)},datetime:dtOrig||gpsDate});
+            return;
+          } else if((marker&0xFF00)===0xFF00){
+            offset+=2+view.getUint16(offset+2);
+          } else break;
         }
         resolve({gps:null,datetime:null});
       }catch(ex){resolve(null);}
@@ -290,7 +278,19 @@ function readExifGPS(file){
   });
 }
 
-// ── CONSTANTS ────────────────────────────────────────────────
+const DRIVE_FOLDER_ID='1IFwSn0n-LW55AZ00b01-LRG6h0ya8rbP';
+
+async function uploadToDrive(meta){
+  const ep=getEndpoint();
+  if(!ep) throw new Error('No Apps Script URL configured');
+  const formData=new URLSearchParams();
+  formData.append('action','driveUpload');
+  formData.append('folderId',DRIVE_FOLDER_ID);
+  Object.entries(meta).forEach(([k,v])=>formData.append(k,v||''));
+  const resp=await fetch(ep,{method:'POST',body:formData,redirect:'follow'});
+  return await resp.json();
+}
+
 const TAB_COLS={
   "Daily Log":["Date","Day #","Phase","Entry Type","Who On Site","Weather","Temp (F)","Work Start","Work End","Hours Worked","Draw #","Materials Used","Mat Cost ($)","Labor Cost ($)","Vendor/Sub Paid","Lien Waiver","Inspection","Insp Result","Safety Issue","Issue/Delay","Work Completed","Next Steps","Photo Log","Doc Ref","Flag"],
   "Payment Ledger":["Txn #","Date","Phase","Fund Source","Payee/Vendor","Status","Trade/Category","Draw #","Amount ($)","Invoice/Ref #","Materials?","Labor?","Lien Waiver Type","LW Status","1099?","Notes","SOW Ref","Doc Log Ref"],
@@ -302,62 +302,52 @@ const TAB_COLS={
 };
 const TAB_ALIASES={"Contacts":"Contacts & Subs","Contact":"Contacts & Subs","Subs":"Contacts & Subs","Bids":"Bid Log","Bid":"Bid Log","HML Banking":"HML Banking & Draws","Payment Log":"Payment Ledger","Documents":"Document Log","Doc Log":"Document Log","Milestones":"Project Milestones"};
 const TODAY=new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'});
-const NOWTIME=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-const NOW_DT=TODAY+' '+NOWTIME;
+const SYS=`You are the HFO auto-logger. Hidden Falls Operations - Jay Gray / Owner-GC | 50189 Hidden Falls Rd, Oakhurst CA 93644. Pre-Construction phase. Today: ${TODAY}. Next sequence numbers: TXN-010 | PMT-004 | DOC-034 | BID-016. Float: ~$20,000 | HML: $158,175 unfunded.
+KNOWN CONTACTS: Torres Plumbing CS-047, NexGen Steel CS-099, CVR Reinforcing CS-098, Jacob Salazar CS-032, Frank Raney CS-044, Sierra Fire CS-063, Wellco Pump CS-097, Jesus Tellez CS-026, Sandlot CS-096. Do NOT create new rows for known contacts - reference existing CS number only.
+VALID TAB NAMES: Daily Log | Payment Ledger | HML Banking & Draws | Document Log | Bid Log | Project Milestones | Contacts & Subs
+ROUTING: Site visit/work/meetings/photos -> Daily Log. Payment -> Daily Log+Payment Ledger+HML Banking & Draws. New bid -> Daily Log+Bid Log. New person/company -> Daily Log+Contacts & Subs. New document -> Daily Log+Document Log. Milestone -> Daily Log+Project Milestones.
+DAILY LOG - all 25 cols required, dash for unknown: Date|Day #|Phase|Entry Type|Who On Site|Weather|Temp (F)|Work Start|Work End|Hours Worked|Draw #|Materials Used|Mat Cost ($)|Labor Cost ($)|Vendor/Sub Paid|Lien Waiver|Inspection|Insp Result|Safety Issue|Issue/Delay|Work Completed|Next Steps|Photo Log|Doc Ref|Flag
+Flag=Y if follow-up needed. Lien waiver required before payment - flag CRITICAL if missing. Return ONLY valid JSON: {"summary":"one sentence","tabs":[{"tab":"exact tab name","action":"Add row","row":{"Column":"value"}}],"flags":[{"severity":"critical|warning|info","message":"text"}]}`;
 
-// SYS_LOG moved to Apps Script server-side
-
-// SYS_PHOTO moved to Apps Script server-side
-
-// ── STATE ────────────────────────────────────────────────────
-let fileQueue=[],queueResults=[],lastTextResult=null,uploadMode='quick',mode='text';
-let isOwnerDevice=false;
-
+let lastResult=null,lastFile=null,lastFileB64=null,lastFileType=null,lastExif=null,mode='text';
 const $=id=>document.getElementById(id);
-const show=id=>{const el=$(id);if(el)el.style.display='';};
-const hide=id=>{const el=$(id);if(el)el.style.display='none';};
-// getKey removed — API key now lives in Apps Script only
+const show=id=>{$(id).style.display='';};
+const hide=id=>{$(id).style.display='none';};
+function getKey(){return localStorage.getItem('hfo_apikey')||'';}
+function getEndpoint(){return localStorage.getItem('hfo_endpoint')||'';}
 
-// ── CONFIG ───────────────────────────────────────────────────
 function saveConfig(){
-  const ep=$('endpoint-input').value.trim(),pin=$('pin-setup-input').value.trim();
-  if(ep)localStorage.setItem('hfo_endpoint',ep);
-  if(pin)localStorage.setItem('hfo_pin',pin);
-  localStorage.setItem('hfo_owner_device','1');
+  const k=$('apikey-input').value.trim(),ep=$('endpoint-input').value.trim(),pin=$('pin-setup-input').value.trim();
+  if(k) localStorage.setItem('hfo_apikey',k);
+  if(ep) localStorage.setItem('hfo_endpoint',ep);
+  if(pin) localStorage.setItem('hfo_pin',pin);
   updateConfigStatus();
 }
 function checkPin(){
   const entered=$('pin-input').value.trim(),stored=localStorage.getItem('hfo_pin');
   if(!stored){$('pin-status').textContent='No PIN set.';return;}
-  if(entered===stored){hide('pin-gate');show('mode-tabs');show('mode-text');}
+  if(entered===stored){hide('pin-gate');$('mode-tabs').style.display='';$('mode-text').style.display='';requestTextGeo();}
   else{$('pin-status').textContent='Incorrect PIN.';$('pin-status').style.color='var(--red-text)';}
 }
-function getEndpoint(){return localStorage.getItem('hfo_endpoint')||'';}
 function updateConfigStatus(){
-  const ep=localStorage.getItem('hfo_endpoint'),s=$('config-status');
-  if(ep){s.innerHTML='<span class="saved-dot"></span>Ready';$('config-card').style.borderColor='var(--green-border)';}
-  else{s.innerHTML='Enter Apps Script URL + PIN then Save.';}
+  const k=getKey(),ep=getEndpoint(),s=$('config-status');
+  if(k&&ep){s.innerHTML='<span class="saved-dot"></span>Ready';localStorage.setItem('hfo_owner_device','1');$('config-card').style.borderColor='var(--green-border)';}
+  else if(k){s.innerHTML='API key saved - add Apps Script URL';}
+  else{s.innerHTML='Enter API key + Apps Script URL then Save.';}
 }
 window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    const ol=document.getElementById('loading-overlay');
-    if(ol){ol.classList.add('hide');setTimeout(()=>ol.remove(),450);}
-  },600);
-  const ep=localStorage.getItem('hfo_endpoint'),pin=localStorage.getItem('hfo_pin');
-  isOwnerDevice=!!localStorage.getItem('hfo_owner_device');
-  if(isOwnerDevice){
-    if(ep)$('endpoint-input').value=ep;
-    if(pin)$('pin-setup-input').value='........';
-    updateConfigStatus();
-  } else if(pin){
-    hide('config-card');show('pin-gate');hide('mode-tabs');hide('mode-text');
-  } else {
-    updateConfigStatus();
-  }
+  const k=getKey(),ep=getEndpoint(),pin=localStorage.getItem('hfo_pin');
+  if(k) $('apikey-input').value=k;
+  if(ep) $('endpoint-input').value=ep;
+  if(pin) $('pin-setup-input').value='........';
+  updateConfigStatus();
+  const isOwner=localStorage.getItem('hfo_owner_device');
+  if(k&&ep&&pin&&!isOwner){hide('config-card');show('pin-gate');hide('mode-tabs');hide('mode-text');}
+  else{requestTextGeo();}
 });
 $('apikey-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveConfig();});
+$('endpoint-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveConfig();});
 
-// ── MODE ─────────────────────────────────────────────────────
 function setMode(m){
   mode=m;
   $('tab-text').classList.toggle('active',m==='text');
@@ -365,360 +355,252 @@ function setMode(m){
   $(m==='text'?'mode-text':'mode-doc').style.display='';
   $(m==='text'?'mode-doc':'mode-text').style.display='none';
   hide('results');hide('processing');
-}
-function setUploadMode(um){
-  uploadMode=um;
-  $('utoggle-quick').classList.toggle('active',um==='quick');
-  $('utoggle-analyze').classList.toggle('active',um==='analyze');
-  if(um==='quick'){$('process-btn-label').textContent='Upload to Drive';$('process-doc-btn').querySelector('i').className='ti ti-bolt';$('meta-label').textContent='Step 1 — Who & what';}
-  else{$('process-btn-label').textContent='Analyze & Review';$('process-doc-btn').querySelector('i').className='ti ti-cpu';$('meta-label').textContent='Step 1 — Who & what';}
-  updateGPSWarnings();
+  if(m==='text' && textGeo===null && !textGeoAttempted) requestTextGeo();
 }
 
-// ── FILE TYPE ────────────────────────────────────────────────
+// Non-image GPS pin for typed entries. No EXIF needed - browser Geolocation API only.
+let textGeo=null, textGeoAttempted=false;
+function requestTextGeo(){
+  textGeoAttempted=true;
+  const strip=$('text-gps-strip');
+  if(!navigator.geolocation){
+    strip.style.display='flex';strip.className='gps-strip gps-none';
+    strip.innerHTML='<i class="ti ti-map-pin-off"></i><span>Location not supported on this device/browser. Mention the site area in your entry.</span>';
+    return;
+  }
+  strip.style.display='flex';strip.className='gps-strip gps-warn';
+  strip.innerHTML='<i class="ti ti-loader-2 spin"></i><span>Getting your location...</span>';
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      textGeo={lat:pos.coords.latitude.toFixed(6),lon:pos.coords.longitude.toFixed(6),acc:Math.round(pos.coords.accuracy)};
+      strip.className='gps-strip gps-ok';
+      const mapsUrl='https://maps.google.com/?q='+textGeo.lat+','+textGeo.lon;
+      strip.innerHTML='<i class="ti ti-map-pin"></i><div><span style="font-weight:600">Location pinned</span> - '+textGeo.lat+', '+textGeo.lon+' (\u00b1'+textGeo.acc+'m)<br><a href="'+mapsUrl+'" target="_blank" style="color:var(--green-text);font-size:10px;text-decoration:underline">Verify on map</a> &nbsp;<a href="#" onclick="requestTextGeo();return false;" style="color:var(--text2);font-size:10px;text-decoration:underline">Refresh</a></div>';
+    },
+    ()=>{
+      textGeo=null;
+      strip.className='gps-strip gps-none';
+      strip.innerHTML='<i class="ti ti-map-pin-off"></i><span><strong>No location captured</strong> (denied or unavailable). Mention the site area in your entry. <a href="#" onclick="requestTextGeo();return false;" style="color:var(--red-text);text-decoration:underline">Try again</a></span>';
+    },
+    {enableHighAccuracy:true,timeout:8000,maximumAge:60000}
+  );
+}
+
 function onTypeCheck(which){
-  if(which==='workphoto')$('chk-receipt').checked=false;
-  if(which==='receipt')$('chk-workphoto').checked=false;
+  if(which==='workphoto') $('chk-receipt').checked=false;
+  if(which==='receipt') $('chk-workphoto').checked=false;
+  updateFilenamePreview();
 }
 function getFileTypeLabel(){
-  if($('chk-workphoto').checked)return 'work-photo';
-  if($('chk-receipt').checked)return 'receipt';
+  if($('chk-workphoto').checked) return 'work-photo';
+  if($('chk-receipt').checked) return 'receipt';
   return null;
 }
-function buildFilename(orig,vendorName){
+function buildFilename(orig){
   const date=new Date().toISOString().slice(0,10);
-  const vendor=(vendorName||'unknown').replace(/[^a-zA-Z0-9 _-]/g,'').replace(/\s+/g,'-').slice(0,30);
+  const vendor=($('vendor-name').value.trim()||'unknown').replace(/[^a-zA-Z0-9 _-]/g,'').replace(/\s+/g,'-').slice(0,30);
   const typeLabel=getFileTypeLabel()||'doc';
   const ext=orig.includes('.')?'.'+orig.split('.').pop():'';
   const base=orig.replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9_-]/g,'-').slice(0,25);
   return `${date}_${vendor}_${typeLabel}_${base}${ext}`;
 }
+function updateFilenamePreview(){
+  if(!lastFile) return;
+  $('filename-text').textContent=buildFilename(lastFile.name);
+  show('filename-preview');
+}
 
-// ── FILE QUEUE ───────────────────────────────────────────────
-function renderQueue(){
-  const qEl=$('file-queue');
-  if(!fileQueue.length){hide('file-queue');hide('process-doc-btn');return;}
-  show('file-queue');show('process-doc-btn');
-  const count=fileQueue.length;
-  if(uploadMode==='quick')$('process-btn-label').textContent=`Upload ${count} file${count!==1?'s':''} to Drive`;
-  else $('process-btn-label').textContent=`Analyze ${count} file${count!==1?'s':''}`;
-  qEl.innerHTML=fileQueue.map((item,i)=>{
-    const gps=item.exif&&item.exif.gps;
-    const gpsIcon=item.file.type.startsWith('image/')
-      ?(gps?'<i class="ti ti-map-pin" style="color:var(--green-text);font-size:12px"></i>':'<i class="ti ti-map-pin-off" style="color:var(--red-text);font-size:12px"></i>')
-      :'<i class="ti ti-file-type-pdf" style="color:var(--text3);font-size:12px"></i>';
-    return `<div class="file-item" id="fitem-${i}">${gpsIcon}<span class="file-item-name">${escH(item.file.name)}</span><span class="file-item-status" id="fstatus-${i}">${(item.file.size/1024).toFixed(0)} KB</span><button class="file-remove" onclick="removeFile(${i})"><i class="ti ti-x"></i></button></div>`;
-  }).join('');
-  updateGPSWarnings();
+function renderGPSStrip(exif){
+  const strip=$('gps-strip');
+  hide('manual-site-wrap');
+  if(!exif){strip.style.display='none';return;}
+  strip.style.display='flex';
+  if(exif.gps){
+    strip.className='gps-strip gps-ok';
+    const mapsUrl='https://maps.google.com/?q='+exif.gps.lat+','+exif.gps.lon;
+    strip.innerHTML='<i class="ti ti-map-pin" style="font-size:14px;flex-shrink:0;margin-top:1px"></i><div><span style="font-weight:600">GPS confirmed</span> - '+exif.gps.lat+', '+exif.gps.lon+(exif.datetime?' - '+exif.datetime:'')+'<br><a href="'+mapsUrl+'" target="_blank" style="color:var(--green-text);font-size:10px;text-decoration:underline">Verify on map</a></div>';
+  } else {
+    strip.className='gps-strip gps-none';
+    strip.innerHTML='<i class="ti ti-map-pin-off" style="font-size:14px;flex-shrink:0;margin-top:1px"></i><span><strong>No GPS in file.</strong> Enter job site below.</span>';
+    show('manual-site-wrap');
+  }
 }
-function updateGPSWarnings(){
-  const wEl=$('gps-warnings');
-  if(uploadMode!=='quick'){wEl.style.display='none';return;}
-  const noGPS=fileQueue.filter(item=>item.file.type.startsWith('image/')&&item.exif&&!item.exif.gps);
-  if(!noGPS.length){wEl.style.display='none';return;}
-  wEl.style.display='';
-  wEl.innerHTML=`<div class="gps-strip gps-none" style="margin-bottom:8px"><i class="ti ti-map-pin-off" style="font-size:14px;flex-shrink:0;margin-top:1px"></i><div><strong>${noGPS.length} image${noGPS.length!==1?'s':''} missing GPS.</strong> Upload direct from camera roll for GPS.</div></div>`;
-}
-function removeFile(idx){fileQueue.splice(idx,1);renderQueue();}
 
 $('file-input').addEventListener('change',async e=>{
-  const files=Array.from(e.target.files);if(!files.length)return;
-  for(const f of files)fileQueue.push({file:f,exif:null,b64:null});
-  for(let i=0;i<fileQueue.length;i++){if(fileQueue[i].exif===null&&fileQueue[i].file.type.startsWith('image/'))fileQueue[i].exif=await readExifGPS(fileQueue[i].file);}
-  renderQueue();$('file-input').value='';
+  const f=e.target.files[0];if(!f) return;
+  lastFile=f;
+  $('drop-zone').innerHTML='<i class="ti ti-file-check" style="font-size:28px;color:var(--green);display:block;margin-bottom:8px"></i><p style="font-size:13px;font-weight:500;color:var(--text);margin:0">'+escH(f.name)+'</p><p style="font-size:11px;color:var(--text2);margin:4px 0 0">'+(f.size/1024).toFixed(0)+' KB - tap to change</p>';
+  show('upload-meta');show('process-doc-btn');
+  hide('gps-strip');hide('manual-site-wrap');hide('filename-preview');
+  lastExif=await readExifGPS(f);
+  renderGPSStrip(lastExif);
+  updateFilenamePreview();
 });
+$('vendor-name').addEventListener('input',updateFilenamePreview);
+
 const dz=$('drop-zone');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-dz.addEventListener('drop',async e=>{
+dz.addEventListener('drop',e=>{
   e.preventDefault();dz.classList.remove('drag');
-  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')||f.type==='application/pdf');
-  for(const f of files)fileQueue.push({file:f,exif:null,b64:null});
-  for(let i=0;i<fileQueue.length;i++){if(fileQueue[i].exif===null&&fileQueue[i].file.type.startsWith('image/'))fileQueue[i].exif=await readExifGPS(fileQueue[i].file);}
-  renderQueue();
+  const f=e.dataTransfer.files[0];
+  if(f){const dt=new DataTransfer();dt.items.add(f);$('file-input').files=dt.files;$('file-input').dispatchEvent(new Event('change'));}
 });
 
-// ── VALIDATE ─────────────────────────────────────────────────
-function validateDocMeta(){
+function validateMeta(){
   if(!$('vendor-name').value.trim()){alert('Enter vendor / uploader name.');$('vendor-name').focus();return false;}
   if(!getFileTypeLabel()){alert('Check one box: Work photo or Receipt.');return false;}
-  if(!fileQueue.length){alert('No files selected.');return false;}
+  if(lastFile&&lastFile.type.startsWith('image/')&&lastExif&&!lastExif.gps){
+    if(!$('manual-site').value.trim()){alert('No GPS found. Enter job site location.');$('manual-site').focus();return false;}
+  }
   return true;
 }
 
-// ── ROUTE DOC ACTION ─────────────────────────────────────────
-function handleDocAction(){if(!validateDocMeta())return;if(uploadMode==='quick')quickUpload();else processAnalyze();}
+async function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
 
-// ── QUICK UPLOAD ─────────────────────────────────────────────
-async function quickUpload(){
-  hide('mode-doc');show('processing');
-  const vendor=$('vendor-name').value.trim();
-  const fieldNotes=$('field-notes').value.trim();
-  const results=[];let logResult=null;
-  for(let i=0;i<fileQueue.length;i++){
-    const item=fileQueue[i];
-    $('proc-label').textContent=`Uploading ${i+1} of ${fileQueue.length}...`;$('proc-sub').textContent=escH(item.file.name);
-    try{
-      const b64=await toBase64(item.file);
-      const filename=buildFilename(item.file.name,vendor);
-      const gps=item.exif&&item.exif.gps?item.exif.gps:null;
-      const res=await uploadToDrive({filename,mimeType:item.file.type||'image/jpeg',base64:b64,vendorName:vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:item.exif&&item.exif.datetime?item.exif.datetime:'',uploadedAt:new Date().toISOString(),saveNotes:'0',aiNotes:''});
-      results.push({file:item.file,filename,success:!!(res&&res.success),fileUrl:res&&res.fileUrl,error:res&&res.error});
-    }catch(err){results.push({file:item.file,filename:buildFilename(item.file.name,vendor),success:false,error:err.message});}
-  }
-  if(fieldNotes){
-    $('proc-label').textContent='Logging field notes...';$('proc-sub').textContent='Writing to Daily Log';
-    try{
-      const fileList=results.map(r=>r.filename).join(', ');
-      const entry=fieldNotes+' Uploaded by: '+vendor+' Files: '+fileList+' File type: '+(getFileTypeLabel()||'doc');
-      const fd2=new URLSearchParams();
-      fd2.append('action','processEntry');
-      fd2.append('entry',entry);
-      fd2.append('nowDt',NOW_DT);
-      const noteResp=await fetch(getEndpoint()+'?'+fd2.toString(),{method:'GET',redirect:'follow'});
-      const noteData=await noteResp.json();
-      if(noteData.success) logResult=noteData.result;
-      else logResult={error:noteData.error||'Failed'};
-      if(logResult&&logResult.tabs&&logResult.tabs.length){
-        const payload=logResult.tabs.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
-        const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-        await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
-      }
-    }catch(err){logResult={error:err.message};}
-  }
-  hide('processing');renderQuickResults(results,logResult,fieldNotes);
+async function callClaude(messages){
+  const key=getKey();if(!key) throw new Error('No API key');
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYS,messages})});
+  const data=await resp.json();
+  if(data.error) throw new Error(data.error.message);
+  const text=data.content.map(b=>b.text||'').join('');
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
 }
 
-function renderQuickResults(results,logResult,fieldNotes){
-  const allOk=results.every(r=>r.success);
-  let h=`<div class="result-card" style="border-color:var(--${allOk?'green':'amber'}-border)">
-    <p style="font-size:14px;font-weight:600;margin:0 0 4px"><i class="ti ti-${allOk?'circle-check':'alert-circle'}" style="color:var(--${allOk?'green':'amber'}-text)"></i> ${allOk?'All files uploaded':'Upload complete — some issues'}</p>
-    <p style="font-size:11px;color:var(--text3);margin:0">${results.length} file${results.length!==1?'s':''} · Site_Receipts_Vendors</p>
-  </div>`;
-  results.forEach(r=>{
-    const col=r.success?'green':'red';
-    h+=`<div class="write-result" style="background:var(--${col}-bg);border:1px solid var(--${col}-border)"><i class="ti ti-${r.success?'folder-check':'alert-triangle'}" style="color:var(--${col}-text);font-size:16px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--${col}-text);margin:0">${r.success?'Saved':'Failed'}: ${escH(r.filename)}</p>${r.fileUrl?`<a href="${r.fileUrl}" target="_blank" style="font-size:11px;color:var(--blue-text)">Open in Drive</a>`:''}${r.error?`<p style="font-size:11px;color:var(--red-text);margin:2px 0 0">${escH(r.error)}</p>`:''}</div></div>`;
-  });
-  if(fieldNotes){
-    if(logResult&&logResult.error){
-      h+=`<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--red-text)">Field notes failed: ${escH(logResult.error)}</span></div>`;
-    } else if(logResult&&logResult.summary){
-      h+=`<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border)"><i class="ti ti-circle-check" style="color:var(--green-text);font-size:16px;flex-shrink:0"></i><div><p style="font-size:12px;font-weight:600;color:var(--green-text);margin:0 0 2px">Field notes logged</p><p style="font-size:11px;color:var(--text2);margin:0">${escH(logResult.summary)}</p></div></div>`;
-    }
-  }
-  if(isOwnerDevice){
-    h+=`<a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin:8px 0"><i class="ti ti-external-link"></i> Open sheet</a>`;
-  }
-  h+=`<div style="margin-top:0.5rem"><button class="btn-ghost" onclick="resetApp()" style="width:100%">New upload</button></div>`;
-  $('results').innerHTML=h;show('results');
-}
-
-// ── ANALYZE MODE ─────────────────────────────────────────────
-async function processAnalyze(){
-  hide('mode-doc');show('processing');queueResults=[];
-  const vendor=$('vendor-name').value.trim();
-  for(let i=0;i<fileQueue.length;i++){
-    const item=fileQueue[i];
-    $('proc-label').textContent=`Analyzing ${i+1} of ${fileQueue.length}...`;$('proc-sub').textContent=escH(item.file.name);
-    try{
-      const b64=await toBase64(item.file);const mimeType=item.file.type||'image/jpeg';
-      const isPDF=item.file.type==='application/pdf';
-      const fd3=new URLSearchParams();
-      fd3.append('action','processDoc');
-      fd3.append('base64',b64);
-      fd3.append('mimeType',mimeType);
-      fd3.append('nowDt',NOW_DT);
-      fd3.append('analyzeMode',uploadMode==='analyze'?'1':'0');
-      const docResp=await fetch(getEndpoint()+'?'+fd3.toString(),{method:'GET',redirect:'follow'});
-      const docData=await docResp.json();
-      if(!docData.success) throw new Error(docData.error||'Server error');
-      const logResult=docData.result;
-      const aiNotes=docData.aiNotes||null;
-      queueResults.push({file:item.file,exif:item.exif,b64,mimeType,vendor,aiNotes,logResult,filename:buildFilename(item.file.name,vendor)});
-    }catch(err){queueResults.push({file:item.file,error:err.message});}
-  }
-  hide('processing');renderAnalyzeReview();
-}
-
-function renderAnalyzeReview(){
-  let h=`<div class="result-card" style="border-color:var(--amber-border)"><p style="font-size:14px;font-weight:600;margin:0 0 4px">${queueResults.length} file${queueResults.length!==1?'s':''} analyzed — check what to log</p><p style="font-size:11px;color:var(--text3);margin:0">Uncheck any section to skip it.</p></div>`;
-  queueResults.forEach((res,ri)=>{
-    if(res.error){h+=`<div class="result-card" style="border-color:var(--red-border)"><p style="font-size:13px;font-weight:600;color:var(--red-text);margin:0">${escH(res.file.name)}</p><p style="font-size:12px;color:var(--text2);margin:4px 0 0">${escH(res.error)}</p></div>`;return;}
-    const r=res.logResult;const gps=res.exif&&res.exif.gps?res.exif.gps:null;
-    h+=`<div class="result-card"><p style="font-size:13px;font-weight:700;margin:0 0 4px"><i class="ti ti-file-check" style="color:var(--green-text)"></i> ${escH(res.file.name)}</p><p style="font-size:11px;color:var(--text3);font-family:monospace;margin:0 0 8px">${escH(res.filename)}</p>`;
-    if(gps)h+=`<div class="gps-strip gps-ok" style="margin-bottom:8px"><i class="ti ti-map-pin" style="font-size:13px;flex-shrink:0"></i><div>GPS: ${escH(gps.lat)}, ${escH(gps.lon)} · <a href="https://maps.google.com/?q=${gps.lat},${gps.lon}" target="_blank" style="color:var(--green-text);text-decoration:underline">Map</a></div></div>`;
-    if(r.summary)h+=`<p style="font-size:12px;color:var(--text2);margin:0 0 8px;font-style:italic">${escH(r.summary)}</p>`;
-    if(r.flags&&r.flags.length)r.flags.forEach(flag=>{const s=sevStyle(flag.severity);h+=`<div class="flag-row" style="background:${s.bg};border:1px solid ${s.border};margin-bottom:6px"><i class="ti ${s.icon}" style="color:${s.text};font-size:14px;flex-shrink:0"></i><span style="color:${s.text}">${escH(flag.message)}</span></div>`;});
-    if(res.aiNotes)h+=`<div class="review-section"><div class="review-section-header"><label><input type="checkbox" id="chk-ainotes-${ri}" checked><i class="ti ti-eye" style="color:var(--amber);font-size:14px"></i> AI Photo Notes (save as .txt)</label></div><div class="review-section-body"><div class="ai-notes">${escH(res.aiNotes)}</div></div></div>`;
-    if(r.tabs&&r.tabs.length)r.tabs.forEach((tab,ti)=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;h+=`<div class="review-section"><div class="review-section-header"><label><input type="checkbox" id="chk-tab-${ri}-${ti}" checked><i class="ti ti-table" style="color:var(--blue-text);font-size:14px"></i> Log to: ${escH(rt)}</label></div><div class="review-section-body"><div>`;Object.entries(tab.row).forEach(([col,val])=>{if(!val||val==='-')return;h+=`<div class="field-row"><span class="field-col">${escH(col)}</span><span class="field-val">${escH(String(val))}</span></div>`;});h+=`</div></div></div>`;});
-    h+=`<div class="review-section"><div class="review-section-header"><label><input type="checkbox" id="chk-drive-${ri}" checked><i class="ti ti-brand-google-drive" style="color:var(--blue-text);font-size:14px"></i> Save file to Drive</label></div></div></div>`;
-  });
-  h+=`<button class="btn-write" onclick="commitAnalyze()"><i class="ti ti-circle-check"></i> Commit selected</button>`;
-  h+=`<div id="commit-status" style="display:none;margin-top:0.5rem"></div>`;
-  h+=`<div style="margin-top:0.5rem"><button class="btn-ghost" onclick="resetApp()" style="width:100%">New entry</button></div>`;
-  $('results').innerHTML=h;show('results');
-}
-
-async function commitAnalyze(){
-  const btn=document.querySelector('.btn-write');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Committing...';
-  const statusEl=$('commit-status');statusEl.style.display='';let html='';
-  for(let ri=0;ri<queueResults.length;ri++){
-    const res=queueResults[ri];if(res.error)continue;
-    html+=`<p style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">${escH(res.file.name)}</p>`;
-    const saveDrive=$(`chk-drive-${ri}`)&&$(`chk-drive-${ri}`).checked;
-    if(saveDrive&&res.b64){
-      try{
-        const gps=res.exif&&res.exif.gps?res.exif.gps:null;
-        const saveNotes=$(`chk-ainotes-${ri}`)&&$(`chk-ainotes-${ri}`).checked&&res.aiNotes;
-        const dr=await uploadToDrive({filename:res.filename,mimeType:res.mimeType,base64:res.b64,vendorName:res.vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:res.exif&&res.exif.datetime?res.exif.datetime:'',uploadedAt:new Date().toISOString(),saveNotes:saveNotes?'1':'0',aiNotes:res.aiNotes||''});
-        if(dr&&dr.success)html+=`<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border);padding:6px 10px"><i class="ti ti-folder-check" style="color:var(--green-text);flex-shrink:0"></i><div style="flex:1;font-size:12px">Saved to Drive ${dr.fileUrl?`· <a href="${dr.fileUrl}" target="_blank" style="color:var(--blue-text)">Open</a>`:''}</div></div>`;
-        else throw new Error(dr&&dr.error?dr.error:'Upload failed');
-      }catch(err){html+=`<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border);padding:6px 10px"><i class="ti ti-alert-triangle" style="color:var(--red-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--red-text)">Drive: ${escH(err.message)}</span></div>`;}
-    }
-    const r=res.logResult;
-    if(r.tabs&&r.tabs.length){
-      const sel=r.tabs.filter((_,ti)=>$(`chk-tab-${ri}-${ti}`)&&$(`chk-tab-${ri}-${ti}`).checked);
-      if(sel.length){
-        try{
-          const payload=sel.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
-          const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-          const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
-          const data=await resp.json();
-          if(data.success)data.results.forEach(r2=>{html+=`<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border);padding:6px 10px"><i class="ti ti-circle-check" style="color:var(--green-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--green-text)">${escH(r2.tab)} — row added</span></div>`;});
-          else throw new Error(data.error||'Write failed');
-        }catch(err){html+=`<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border);padding:6px 10px"><i class="ti ti-alert-triangle" style="color:var(--red-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--red-text)">Sheets: ${escH(err.message)}</span></div>`;}
-      }
-    }
-  }
-  if(isOwnerDevice)html+=`<a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:10px"><i class="ti ti-external-link"></i> Open sheet</a>`;
-  statusEl.innerHTML=html;btn.innerHTML='<i class="ti ti-circle-check"></i> Done';btn.style.background='var(--green)';
-}
-
-// ── TEXT MODE ────────────────────────────────────────────────
-async function fetchNextCS(){
-  try{
-    const ep=getEndpoint();
-    if(!ep) return 'CS-121';
-    const resp=await fetch(ep+'?action=getNextCS',{method:'GET',redirect:'follow'});
-    const data=await resp.json();
-    return data.success?data.nextCS:'CS-121';
-  }catch(e){return 'CS-121';}
+// Text entries no longer call Anthropic from the browser at all - Apps Script does it
+// server-side with a key from Script Properties. Key never touches this device.
+async function callClaudeServerSide(entryText){
+  const ep=getEndpoint();if(!ep) throw new Error('No Apps Script URL configured');
+  const fd=new URLSearchParams();
+  fd.append('action','processEntry');
+  fd.append('entry',entryText);
+  const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
+  const data=await resp.json();
+  if(data.success===false) throw new Error(data.error||'Processing failed');
+  return data;
 }
 
 async function processText(){
   const entry=$('entry-text').value.trim();if(!entry){$('entry-text').focus();return;}
-  const savedEntry=entry;
-  const ep=getEndpoint();
-  if(!ep){alert('No Apps Script URL — enter it in setup.');return;}
   hide('mode-text');show('processing');
-  $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields · Mapping to tabs';
+  $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields - Mapping to tabs';
+  const geoLine=textGeo?('[Field GPS pin: '+textGeo.lat+', '+textGeo.lon+' (\u00b1'+textGeo.acc+'m), captured '+new Date().toISOString()+']\n\n'):'';
+  try{const result=await callClaudeServerSide(geoLine+entry);lastResult=result;hide('processing');renderResults(result,false);}
+  catch(err){hide('processing');show('mode-text');alert('Error: '+err.message);}
+}
+
+async function processDoc(){
+  if(!lastFile) return;if(!validateMeta()) return;
+  hide('mode-doc');show('processing');
+  $('proc-label').textContent='Reading '+lastFile.name+'...';$('proc-sub').textContent='Identifying document - Extracting fields';
   try{
-    const params=new URLSearchParams();
-    params.append('action','processEntry');
-    params.append('entry',entry);
-    params.append('nowDt',NOW_DT);
-    const resp=await fetch(ep+'?'+params.toString(),{method:'GET',redirect:'follow'});
-    const data=await resp.json();
-    if(!data.success) throw new Error(data.error||'Server error');
-    lastTextResult=data.result;
-    if(!lastTextResult.tabs||!lastTextResult.tabs.length){
-      hide('processing');show('mode-text');$('entry-text').value=savedEntry;
-      alert('No log entries extracted. Add more detail and try again.');return;
-    }
-    hide('processing');renderTextResults(lastTextResult);
+    const b64=await toBase64(lastFile);lastFileB64=b64;lastFileType=lastFile.type||'image/jpeg';
+    const isPDF=lastFile.type==='application/pdf';
+    const block=isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:lastFileType,data:b64}};
+    const result=await callClaude([{role:'user',content:[block,{type:'text',text:'Process this HFO document and return log entries.'}]}]);
+    lastResult=result;hide('processing');renderResults(result,true);
+  }catch(err){hide('processing');show('mode-doc');alert('Error: '+err.message);}
+}
+
+async function writeToSheets(){
+  const ep=getEndpoint();if(!ep){alert('No Apps Script URL');return;}
+  const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Writing...';
+  try{
+    const payload=lastResult.tabs.map(tab=>{
+      const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);
+      const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});
+      return {tab:rt,row};
+    });
+    const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
+    const resp=await fetch(ep,{method:'POST',body:fd,redirect:'follow'});
+    renderWriteResults(await resp.json());
   }catch(err){
-    hide('processing');show('mode-text');$('entry-text').value=savedEntry;
-    alert('Error: '+err.message);
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-table-import"></i> Write to Google Sheets';
+    $('write-status').style.display='';
+    $('write-status').innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Write failed: '+escH(err.message)+'</span></div>';
   }
 }
 
-function renderTextResults(r){
-  let h=`<div class="result-card" style="border-color:var(--amber-border)"><p style="font-size:14px;font-weight:600;margin:0 0 4px">${escH(r.summary)}</p><p style="font-size:11px;color:var(--text3);margin:0">${(r.tabs||[]).length} tab${(r.tabs||[]).length!==1?'s':''} affected</p></div>`;
-  if(r.flags&&r.flags.length)[...r.flags].sort((a,b)=>['critical','warning','info'].indexOf(a.severity)-['critical','warning','info'].indexOf(b.severity)).forEach(flag=>{const s=sevStyle(flag.severity);h+=`<div class="flag-row" style="background:${s.bg};border:1px solid ${s.border}"><i class="ti ${s.icon}" style="color:${s.text};font-size:15px;flex-shrink:0;margin-top:1px"></i><span style="color:${s.text};font-weight:${flag.severity==='critical'?600:400}">${escH(flag.message)}</span></div>`;});
-  if(r.tabs&&r.tabs.length)r.tabs.forEach((tab,i)=>{
-    const rt=TAB_ALIASES[tab.tab]||tab.tab;
-    h+=`<div class="review-section" style="margin-bottom:8px"><div class="review-section-header"><label><input type="checkbox" id="txt-tab-${i}" checked><i class="ti ti-table" style="color:var(--blue-text);font-size:14px"></i> Log to: ${escH(rt)}</label><button class="btn-copy" onclick="copyRow('${escH(rt)}',${i},this)"><i class="ti ti-clipboard"></i> Copy</button></div><div class="review-section-body"><div>`;
-    Object.entries(tab.row).forEach(([col,val])=>{if(!val||val==='-')return;h+=`<div class="field-row"><span class="field-col">${escH(col)}</span><span class="field-val">${escH(String(val))}</span></div>`;});
-    h+=`</div></div></div>`;
-  });
-  h+=`<button class="btn-write" onclick="commitTextEntry()"><i class="ti ti-table-import"></i> Write selected to Sheets</button>`;
-  h+=`<div id="write-status" style="display:none;margin-top:0.5rem"></div>`;
-  h+=`<div style="margin-top:0.5rem"><button class="btn-ghost" onclick="resetApp()" style="width:100%">New entry</button></div>`;
+async function saveToDrive(){
+  if(!lastFile||!lastFileB64) return;
+  const btn=$('drive-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Saving to Drive...';
+  try{
+    const vendor=$('vendor-name').value.trim();
+    const filename=buildFilename(lastFile.name);
+    const gps=lastExif&&lastExif.gps?lastExif.gps:null;
+    const manualSite=$('manual-site')?$('manual-site').value.trim():'';
+    const result=await uploadToDrive({filename,mimeType:lastFileType,base64:lastFileB64,vendorName:vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:lastExif&&lastExif.datetime?lastExif.datetime:'',manualSite,uploadedAt:new Date().toISOString()});
+    if(result&&result.success){
+      btn.innerHTML='<i class="ti ti-circle-check"></i> Saved to Drive';btn.style.background='var(--green)';
+      const el=$('drive-status');el.style.display='';
+      el.innerHTML='<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border)"><i class="ti ti-folder-check" style="color:var(--green-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--green-text);margin:0 0 2px">Saved to Site_Receipts_Vendors</p><p style="font-size:11px;color:var(--text2);margin:0;font-family:monospace">'+escH(filename)+'</p>'+(result.fileUrl?'<a href="'+result.fileUrl+'" target="_blank" style="font-size:11px;color:var(--blue-text);display:inline-flex;align-items:center;gap:3px;margin-top:6px"><i class="ti ti-external-link" style="font-size:11px"></i> Open in Drive</a>':'')+'</div></div>';
+    } else throw new Error(result&&result.error?result.error:'Upload failed');
+  }catch(err){
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-brand-google-drive"></i> Save to Drive';
+    const el=$('drive-status');el.style.display='';
+    el.innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Drive save failed: '+escH(err.message)+'</span></div>';
+  }
+}
+
+function renderWriteResults(data){
+  const el=$('write-status');el.style.display='';let h='';
+  if(data.success&&data.results){
+    const allOk=data.results.every(r=>r.success),col=allOk?'green':'amber';
+    h+='<div class="write-result" style="background:var(--'+col+'-bg);border:1px solid var(--'+col+'-border)"><i class="ti '+(allOk?'ti-circle-check':'ti-alert-circle')+'" style="color:var(--'+col+'-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--'+col+'-text);margin:0 0 8px">'+(allOk?'Written to sheets':'Partial write')+'</p><div>';
+    data.results.forEach(r=>{h+='<div class="tab-write-row"><span style="color:var(--text2)">'+escH(r.tab)+'</span><span style="color:'+(r.success?'var(--green-text)':'var(--red-text)')+';font-weight:500">'+(r.success?'Row '+(r.row||'added'):''+escH(r.error||'failed'))+'</span></div>';});
+    h+='</div><a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:10px"><i class="ti ti-external-link" style="font-size:13px"></i> Open sheet</a></div></div>';
+    const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-circle-check"></i> Written to sheets';btn.style.background='var(--green)';
+  } else {
+    h+='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">'+escH(data.error||'Write failed')+'</span></div>';
+  }
+  el.innerHTML=h;
+}
+
+function escH(s){const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+function sevStyle(s){
+  if(s==='critical') return {bg:'var(--red-bg)',border:'var(--red-border)',text:'var(--red-text)',icon:'ti-alert-triangle'};
+  if(s==='warning') return {bg:'var(--amber-bg)',border:'var(--amber-border)',text:'var(--amber-text)',icon:'ti-alert-circle'};
+  return {bg:'var(--blue-bg)',border:'var(--blue-border)',text:'var(--blue-text)',icon:'ti-info-circle'};
+}
+
+function renderResults(r,isDocMode){
+  let h='<div class="result-card" style="border-color:var(--amber-border)"><p style="font-size:14px;font-weight:600;color:var(--text);margin:0 0 4px">'+escH(r.summary)+'</p><p style="font-size:11px;color:var(--text3);margin:0">'+(r.tabs||[]).length+' tab'+((r.tabs||[]).length!==1?'s':'')+' affected</p></div>';
+  if(r.flags&&r.flags.length){
+    [...r.flags].sort((a,b)=>['critical','warning','info'].indexOf(a.severity)-['critical','warning','info'].indexOf(b.severity)).forEach(flag=>{
+      const s=sevStyle(flag.severity);h+='<div class="flag-row" style="background:'+s.bg+';border:1px solid '+s.border+'"><i class="ti '+s.icon+'" style="color:'+s.text+';font-size:15px;flex-shrink:0;margin-top:1px"></i><span style="color:'+s.text+';font-weight:'+(flag.severity==='critical'?600:400)+'">'+escH(flag.message)+'</span></div>';
+    });
+  }
+  if(r.tabs&&r.tabs.length){
+    r.tabs.forEach((tab,i)=>{
+      const rt=TAB_ALIASES[tab.tab]||tab.tab;
+      h+='<div class="result-card"><div class="tab-header"><i class="ti ti-table" style="font-size:15px;color:var(--blue-text)"></i><span class="tab-name">'+escH(rt)+'</span><span class="tab-action">- '+escH(tab.action||'Add row')+'</span><button class="btn-copy" onclick="copyRow(\''+escH(rt)+'\','+i+',this)"><i class="ti ti-clipboard"></i> Copy</button></div><div>';
+      Object.entries(tab.row).forEach(([col,val])=>{if(val===null||val===undefined||val===''||val==='-') return;h+='<div class="field-row"><span class="field-col">'+escH(col)+'</span><span class="field-val">'+escH(String(val))+'</span></div>';});
+      h+='</div></div>';
+    });
+  }
+  h+='<button class="btn-write" id="write-btn" onclick="writeToSheets()"><i class="ti ti-table-import"></i> Write to Google Sheets</button><div id="write-status" style="display:none"></div>';
+  if(isDocMode){
+    h+='<button class="btn-drive" id="drive-btn" onclick="saveToDrive()"><i class="ti ti-brand-google-drive"></i> Save to Site_Receipts_Vendors</button><div id="drive-status" style="display:none"></div>';
+  }
+  h+='<div style="margin-top:0.5rem"><button class="btn-ghost" onclick="resetApp()" style="width:100%">New entry</button></div>';
   $('results').innerHTML=h;show('results');
 }
 
-async function commitTextEntry(){
-  const btn=document.querySelector('.btn-write');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Writing...';
-  try{
-    const sel=lastTextResult.tabs.filter((_,i)=>$(`txt-tab-${i}`)&&$(`txt-tab-${i}`).checked);
-    const payload=sel.map(tab=>{const rt=TAB_ALIASES[tab.tab]||tab.tab;const cols=TAB_COLS[rt]||Object.keys(tab.row);const row={};cols.forEach(c=>{row[c]=tab.row[c]!==undefined?tab.row[c]:'';});return{tab:rt,row};});
-    const fd=new URLSearchParams();fd.append('data',JSON.stringify(payload));
-    const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
-    const data=await resp.json();
-    const statusEl=$('write-status');statusEl.style.display='';
-    if(data.success){
-      let sh='';
-      data.results.forEach(r=>{sh+=`<div class="write-result" style="background:var(--green-bg);border:1px solid var(--green-border);padding:6px 10px"><i class="ti ti-circle-check" style="color:var(--green-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--green-text)">${escH(r.tab)} — row added</span></div>`;});
-      if(isOwnerDevice)sh+=`<a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:8px"><i class="ti ti-external-link"></i> Open sheet</a>`;
-      statusEl.innerHTML=sh;btn.innerHTML='<i class="ti ti-circle-check"></i> Written';btn.style.background='var(--green)';
-    } else throw new Error(data.error||'Write failed');
-  }catch(err){
-    btn.disabled=false;btn.innerHTML='<i class="ti ti-table-import"></i> Write selected to Sheets';
-    $('write-status').style.display='';
-    $('write-status').innerHTML=`<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border);padding:6px 10px"><i class="ti ti-alert-triangle" style="color:var(--red-text);flex-shrink:0"></i><span style="font-size:12px;color:var(--red-text)">Failed: ${escH(err.message)}</span></div>`;
-  }
-}
-
 function copyRow(tabName,idx,btn){
-  if(!lastTextResult||!lastTextResult.tabs[idx])return;
-  const row=lastTextResult.tabs[idx].row,cols=TAB_COLS[tabName]||Object.keys(row);
+  if(!lastResult||!lastResult.tabs[idx]) return;
+  const row=lastResult.tabs[idx].row,cols=TAB_COLS[tabName]||Object.keys(row);
   navigator.clipboard.writeText(cols.map(c=>{const v=row[c];return(v!==null&&v!==undefined)?String(v):'';}).join('\t')).then(()=>{const o=btn.innerHTML;btn.innerHTML='<i class="ti ti-check"></i> Copied';setTimeout(()=>btn.innerHTML=o,2000);});
 }
 
-// ── SAFE JSON PARSE ─────────────────────────────────────────
-function safeParseJSON(raw){
-  let clean=raw.replace(/```json/g,'').replace(/```/g,'').trim();
-  const start=clean.indexOf('{');
-  const end=clean.lastIndexOf('}');
-  if(start===-1||end===-1) throw new Error('No JSON in response. Check entry for unusual characters.');
-  clean=clean.slice(start,end+1);
-  // Attempt 1: direct parse
-  try{return JSON.parse(clean);}catch(e1){console.warn('Parse 1:',e1.message);}
-  // Attempt 2: replace CR LF TAB using charCode — avoids escape sequence issues
-  try{
-    let s=clean;
-    const LF=String.fromCharCode(10),CR=String.fromCharCode(13),TAB=String.fromCharCode(9);
-    s=s.split(LF).join(' ').split(CR).join(' ').split(TAB).join(' ');
-    return JSON.parse(s);
-  }catch(e2){console.warn('Parse 2:',e2.message);}
-  console.error('Raw response:',raw.slice(0,800));
-  throw new Error('Could not parse Claude response. Open F12 > Console for details. Try simplifying your entry.');
-}
-
-// ── API + DRIVE ───────────────────────────────────────────────
-async function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
-// callClaude removed — all AI calls now route through Apps Script server-side
-async function uploadToDrive(meta){
-  const fd=new URLSearchParams();fd.append('action','driveUpload');fd.append('folderId',DRIVE_FOLDER_ID);
-  Object.entries(meta).forEach(([k,v])=>fd.append(k,v||''));
-  const resp=await fetch(getEndpoint()+'?'+fd.toString(),{method:'GET',redirect:'follow'});
-  return await resp.json();
-}
-
-// ── HELPERS ───────────────────────────────────────────────────
-function escH(s){const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
-function sevStyle(s){
-  if(s==='critical')return{bg:'var(--red-bg)',border:'var(--red-border)',text:'var(--red-text)',icon:'ti-alert-triangle'};
-  if(s==='warning')return{bg:'var(--amber-bg)',border:'var(--amber-border)',text:'var(--amber-text)',icon:'ti-alert-circle'};
-  return{bg:'var(--blue-bg)',border:'var(--blue-border)',text:'var(--blue-text)',icon:'ti-info-circle'};
-}
 function resetApp(){
-  fileQueue=[];queueResults=[];lastTextResult=null;
+  lastResult=null;lastFile=null;lastFileB64=null;lastFileType=null;lastExif=null;
+  textGeo=null;textGeoAttempted=false;hide('text-gps-strip');
   hide('results');hide('processing');setMode('text');
   $('entry-text').value='';
-  $('drop-zone').innerHTML='<i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i><p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Step 2 — Tap to select files</p><p style="font-size:11px;color:var(--text2);margin:0">One or multiple — JPG, PNG, PDF</p>';
-  hide('file-queue');hide('process-doc-btn');hide('gps-warnings');$('file-input').value='';
-  $('vendor-name').value='';$('field-notes').value='';$('chk-workphoto').checked=false;$('chk-receipt').checked=false;
+  $('drop-zone').innerHTML='<i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i><p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Drop or tap to upload</p><p style="font-size:11px;color:var(--text2);margin:0">Invoice - Lien Waiver - Bid - Permit - Receipt - Site Photo</p>';
+  hide('upload-meta');hide('process-doc-btn');$('file-input').value='';
+  $('vendor-name').value='';$('chk-workphoto').checked=false;$('chk-receipt').checked=false;
+  hide('gps-strip');hide('manual-site-wrap');hide('filename-preview');
 }
 </script>
 </body>
