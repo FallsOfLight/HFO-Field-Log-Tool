@@ -44,7 +44,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .config-note a{color:var(--amber);text-decoration:none}
 .saved-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle}
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card2);border-radius:var(--rs);padding:3px;margin-bottom:1rem}
-.mode-tab{padding:8px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s}
+.mode-tab{padding:8px 4px;text-align:center;font-size:12px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s;line-height:1.3}
 .mode-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border)}
 .entry-area{width:100%;min-height:140px;font-size:14px;padding:10px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--card2);color:var(--text);resize:vertical;font-family:inherit;line-height:1.6}
 .entry-area:focus{outline:none;border-color:var(--amber)}
@@ -132,8 +132,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="mode-tabs">
-    <button class="mode-tab active" id="tab-text" onclick="setMode('text')"><i class="ti ti-pencil"></i> Type entry</button>
-    <button class="mode-tab" id="tab-doc" onclick="setMode('doc')"><i class="ti ti-file-upload"></i> Upload doc</button>
+    <button class="mode-tab active" id="tab-text" onclick="setMode('text')"><i class="ti ti-pencil"></i> Field Entry / Work Log</button>
+    <button class="mode-tab" id="tab-doc" onclick="setMode('doc')"><i class="ti ti-file-upload"></i> Attach Files/Images</button>
   </div>
 
   <div id="mode-text">
@@ -306,14 +306,19 @@ const TAB_COLS={
 };
 const TAB_ALIASES={"Contacts":"Contacts & Subs","Contact":"Contacts & Subs","Subs":"Contacts & Subs","Bids":"Bid Log","Bid":"Bid Log","HML Banking":"HML Banking & Draws","Payment Log":"Payment Ledger","Documents":"Document Log","Doc Log":"Document Log","Milestones":"Project Milestones"};
 const TODAY=new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'});
-const SYS=`You are the HFO auto-logger. Hidden Falls Operations - Jay Gray / Owner-GC | 50189 Hidden Falls Rd, Oakhurst CA 93644. Pre-Construction phase. Today: ${TODAY}. Next sequence numbers: TXN-010 | PMT-004 | DOC-034 | BID-016. Float: ~$20,000 | HML: $158,175 unfunded.
-KNOWN CONTACTS: Torres Plumbing CS-047, NexGen Steel CS-099, CVR Reinforcing CS-098, Jacob Salazar CS-032, Frank Raney CS-044, Sierra Fire CS-063, Wellco Pump CS-097, Jesus Tellez CS-026, Sandlot CS-096. Do NOT create new rows for known contacts - reference existing CS number only.
+const SYS=`You are the HFO auto-logger. Hidden Falls Operations - Jay Gray / Owner-GC | 50189 Hidden Falls Rd, Oakhurst CA 93644. Pre-Construction phase. Today: ${TODAY}.
+CRITICAL: Do NOT invent ID numbers for Contact ID, Doc ID, Bid ID, or Txn # - leave those fields blank or write "PENDING". The Apps Script backend assigns the real next number when it writes the row. A guessed ID is worse than no ID - it can collide with or duplicate a real one.
+You have exactly two valid response shapes - always return one of them as pure JSON, nothing else, no preamble, no code fences:
+1. NORMAL LOG: {"summary":"one sentence","tabs":[{"tab":"exact tab name","action":"Add row","row":{"Column":"value"}}],"flags":[{"severity":"critical|warning|info","message":"text"}]}
+2. NEEDS CLARIFICATION: {"needsClarification":true,"question":"one short, specific question"} - use ONLY when the entry is too vague, ambiguous, or garbled to log with a reasonable guess. Prefer guessing with a flag over asking - only ask when a guess would genuinely be unusable (e.g. a single unclear word, a typo with no discernible meaning). Ask exactly one specific question, not a list.
+Do NOT create new Contacts & Subs rows for people/companies already likely known unless the entry clearly describes someone new - when in doubt, still log the Daily Log entry but skip the Contacts & Subs row rather than guessing at whether they already exist.
 VALID TAB NAMES: Daily Log | Payment Ledger | HML Banking & Draws | Document Log | Bid Log | Project Milestones | Contacts & Subs
 ROUTING: Site visit/work/meetings/photos -> Daily Log. Payment -> Daily Log+Payment Ledger+HML Banking & Draws. New bid -> Daily Log+Bid Log. New person/company -> Daily Log+Contacts & Subs. New document -> Daily Log+Document Log. Milestone -> Daily Log+Project Milestones.
 DAILY LOG - all 25 cols required, dash for unknown: Date|Day #|Phase|Entry Type|Who On Site|Weather|Temp (F)|Work Start|Work End|Hours Worked|Draw #|Materials Used|Mat Cost ($)|Labor Cost ($)|Vendor/Sub Paid|Lien Waiver|Inspection|Insp Result|Safety Issue|Issue/Delay|Work Completed|Next Steps|Photo Log|Doc Ref|Flag
-Flag=Y if follow-up needed. Lien waiver required before payment - flag CRITICAL if missing. Return ONLY valid JSON: {"summary":"one sentence","tabs":[{"tab":"exact tab name","action":"Add row","row":{"Column":"value"}}],"flags":[{"severity":"critical|warning|info","message":"text"}]}`;
+Flag=Y if follow-up needed. Lien waiver required before payment - flag CRITICAL if missing.`;
 
 let lastResult=null,lastFile=null,lastFileB64=null,lastFileType=null,lastExif=null,mode='text';
+let pendingClarification=null; // {mode:'text', entry} or {mode:'doc', block}
 const $=id=>document.getElementById(id);
 const show=id=>{$(id).style.display='';};
 const hide=id=>{$(id).style.display='none';};
@@ -462,13 +467,32 @@ function validateMeta(){
 
 async function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
 
+function safeParseJSON(text){
+  const cleaned=text.replace(/```json|```/g,'').trim();
+  // Tier 1: direct parse
+  try{ return {ok:true, data:JSON.parse(cleaned)}; }catch(e){}
+  // Tier 2: extract the first {...} block in case the AI added text around the JSON
+  const start=cleaned.indexOf('{'), end=cleaned.lastIndexOf('}');
+  if(start!==-1 && end>start){
+    try{ return {ok:true, data:JSON.parse(cleaned.slice(start,end+1))}; }catch(e){}
+  }
+  // Tier 3: give up gracefully - hand back the raw text instead of throwing
+  return {ok:false, rawText:cleaned};
+}
+
 async function callClaude(messages){
   const key=getKey();if(!key) throw new Error('No API key');
   const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYS,messages})});
   const data=await resp.json();
   if(data.error) throw new Error(data.error.message);
   const text=data.content.map(b=>b.text||'').join('');
-  return JSON.parse(text.replace(/```json|```/g,'').trim());
+  const parsed=safeParseJSON(text);
+  if(!parsed.ok){
+    const err=new Error('NEEDS_CLARIFICATION');
+    err.rawText=parsed.rawText;
+    throw err;
+  }
+  return parsed.data;
 }
 
 // Text entries call Anthropic directly - this is the one endpoint that can actually
@@ -483,8 +507,17 @@ async function processText(){
   hide('mode-text');show('processing');
   $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields - Mapping to tabs';
   const geoLine=textGeo?('[Field GPS pin: '+textGeo.lat+', '+textGeo.lon+' (\u00b1'+textGeo.acc+'m), captured '+new Date().toISOString()+']\n\n'):'';
-  try{const result=await callClaudeServerSide(geoLine+entry);lastResult=result;hide('processing');renderResults(result,false);}
-  catch(err){hide('processing');show('mode-text');alert('Error: '+err.message);}
+  const fullEntry=geoLine+entry;
+  pendingClarification={mode:'text', entry:fullEntry};
+  try{
+    const result=await callClaudeServerSide(fullEntry);
+    hide('processing');
+    if(result.needsClarification){ renderClarification(result.question); }
+    else { lastResult=result; renderResults(result,false); }
+  }catch(err){
+    hide('processing');show('mode-text');
+    alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
+  }
 }
 
 async function processDoc(){
@@ -495,9 +528,15 @@ async function processDoc(){
     const b64=await toBase64(lastFile);lastFileB64=b64;lastFileType=lastFile.type||'image/jpeg';
     const isPDF=lastFile.type==='application/pdf';
     const block=isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:lastFileType,data:b64}};
+    pendingClarification={mode:'doc', block:block};
     const result=await callClaude([{role:'user',content:[block,{type:'text',text:'Process this HFO document and return log entries.'}]}]);
-    lastResult=result;hide('processing');renderResults(result,true);
-  }catch(err){hide('processing');show('mode-doc');alert('Error: '+err.message);}
+    hide('processing');
+    if(result.needsClarification){ renderClarification(result.question); }
+    else { lastResult=result; renderResults(result,true); }
+  }catch(err){
+    hide('processing');show('mode-doc');
+    alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
+  }
 }
 
 async function writeToSheets(){
@@ -590,6 +629,45 @@ function renderResults(r,isDocMode){
   $('results').innerHTML=h;show('results');
 }
 
+function renderClarification(question){
+  const h='<div class="result-card" style="border-color:var(--amber-border)">'+
+    '<p style="font-size:14px;font-weight:600;color:var(--text);margin:0 0 8px"><i class="ti ti-help-circle" style="color:var(--amber-text)"></i> Quick question before I log this</p>'+
+    '<p style="font-size:13px;color:var(--text2);margin:0 0 12px">'+escH(question)+'</p>'+
+    '<input type="text" class="text-input-full" id="clarify-input" placeholder="Type your answer...">'+
+    '<button class="btn-primary" id="clarify-submit-btn"><i class="ti ti-send"></i> Submit & continue</button>'+
+    '<button class="btn-ghost" onclick="resetApp()" style="width:100%;margin-top:8px">Start over instead</button>'+
+    '</div>';
+  $('results').innerHTML=h;show('results');
+  $('clarify-input').focus();
+  $('clarify-submit-btn').onclick=submitClarification;
+  $('clarify-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitClarification();});
+}
+
+async function submitClarification(){
+  const answer=$('clarify-input').value.trim();
+  if(!answer) return;
+  const ctx=pendingClarification;
+  if(!ctx) return;
+  hide('results');show('processing');
+  $('proc-label').textContent='Checking your answer...';$('proc-sub').textContent='Re-reading the entry';
+  try{
+    let result;
+    if(ctx.mode==='text'){
+      const combined=ctx.entry+'\n\nAdditional detail: '+answer;
+      pendingClarification={mode:'text', entry:combined};
+      result=await callClaudeServerSide(combined);
+    } else {
+      result=await callClaude([{role:'user',content:[ctx.block,{type:'text',text:'Process this HFO document and return log entries. Additional detail from the field tech: '+answer}]}]);
+    }
+    hide('processing');
+    if(result.needsClarification){ renderClarification(result.question); }
+    else { lastResult=result; renderResults(result, ctx.mode==='doc'); }
+  }catch(err){
+    hide('processing');show(ctx.mode==='text'?'mode-text':'mode-doc');
+    alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
+  }
+}
+
 function copyRow(tabName,idx,btn){
   if(!lastResult||!lastResult.tabs[idx]) return;
   const row=lastResult.tabs[idx].row,cols=TAB_COLS[tabName]||Object.keys(row);
@@ -597,7 +675,7 @@ function copyRow(tabName,idx,btn){
 }
 
 function resetApp(){
-  lastResult=null;lastFile=null;lastFileB64=null;lastFileType=null;lastExif=null;
+  lastResult=null;lastFile=null;lastFileB64=null;lastFileType=null;lastExif=null;pendingClarification=null;
   textGeo=null;textGeoAttempted=false;hide('text-gps-strip');
   hide('results');hide('processing');setMode('text');
   $('entry-text').value='';
