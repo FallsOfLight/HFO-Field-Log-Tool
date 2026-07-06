@@ -49,8 +49,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .entry-area{width:100%;min-height:140px;font-size:14px;padding:10px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--card2);color:var(--text);resize:vertical;font-family:inherit;line-height:1.6}
 .entry-area:focus{outline:none;border-color:var(--amber)}
 .entry-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
-.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1.75rem 1rem;text-align:center;cursor:pointer;background:var(--card2);transition:all 0.15s}
-.drop-zone:hover,.drop-zone.drag{border-color:var(--amber);background:var(--amber-bg)}
 .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--amber);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:0.75rem}
 .btn-primary:hover{opacity:0.88}
 .btn-primary:disabled{opacity:0.35;cursor:not-allowed}
@@ -149,54 +147,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div id="mode-doc" style="display:none">
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      <i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i>
-      <p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Drop or tap to upload</p>
-      <p style="font-size:11px;color:var(--text2);margin:0">Invoice - Lien Waiver - Bid - Permit - Receipt - Site Photo</p>
-      <input id="file-input" type="file" accept="image/*,.pdf" style="display:none">
+    <div class="card" style="text-align:center;padding:1.75rem 1.25rem">
+      <i class="ti ti-file-upload" style="font-size:32px;color:var(--text3);display:block;margin-bottom:12px"></i>
+      <p style="font-size:14px;font-weight:600;color:var(--text);margin:0 0 6px">Photos & files go through the field upload form</p>
+      <p style="font-size:12px;color:var(--text2);margin:0 0 16px;line-height:1.5">Invoice, lien waiver, bid, permit, receipt, site photo - the form handles the upload and logs it automatically.</p>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfhFvnxkBMQq7Iixf-tLmL6XsaoNworM3kTbd7gSDdU5ZrhoQ/viewform" target="_blank" class="btn-primary" style="text-decoration:none;display:flex">
+        <i class="ti ti-external-link"></i> Open HFO Field Upload
+      </a>
     </div>
-
-    <div class="upload-meta" id="upload-meta">
-      <p class="section-label">Before you upload</p>
-
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Vendor / Uploader name <span style="color:var(--red-text)">*</span></label>
-        <input type="text" class="text-input-full" id="vendor-name" placeholder="e.g. Torres Plumbing, Jacob Salazar, Jay Gray">
-      </div>
-
-      <p style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px">What is this file? <span style="color:var(--red-text)">*</span></p>
-      <div class="check-row">
-        <input type="checkbox" id="chk-workphoto" onchange="onTypeCheck('workphoto')">
-        <div>
-          <div class="check-label"><i class="ti ti-camera" style="font-size:13px"></i> Work photo / site image</div>
-          <div class="check-sub">Progress photos, site conditions, installed work, inspections</div>
-        </div>
-      </div>
-      <div class="check-row" style="border-bottom:none">
-        <input type="checkbox" id="chk-receipt" onchange="onTypeCheck('receipt')">
-        <div>
-          <div class="check-label"><i class="ti ti-receipt" style="font-size:13px"></i> Receipt / financial document</div>
-          <div class="check-sub">Invoice, receipt, bid, lien waiver, payment confirmation</div>
-        </div>
-      </div>
-
-      <div id="gps-strip" style="display:none"></div>
-
-      <div id="manual-site-wrap" style="display:none;margin-top:10px">
-        <label style="font-size:12px;font-weight:600;color:var(--red-text);display:block;margin-bottom:4px"><i class="ti ti-map-pin-off" style="font-size:12px"></i> No GPS found in file — enter job site <span style="color:var(--red-text)">*</span></label>
-        <input type="text" class="text-input-full" id="manual-site" placeholder="e.g. Hidden Falls Rd Oakhurst, Gate Area, Shop">
-        <p style="font-size:11px;color:var(--text3);margin-top:4px">Required when GPS is missing. Be specific.</p>
-      </div>
-
-      <div id="filename-preview" style="display:none;margin-top:12px;padding:8px 10px;background:var(--card2);border-radius:var(--rs);border:1px solid var(--border)">
-        <p style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Filename in Drive</p>
-        <p id="filename-text" style="font-size:11px;color:var(--text);font-family:monospace;word-break:break-all"></p>
-      </div>
-    </div>
-
-    <button class="btn-primary" id="process-doc-btn" style="display:none" onclick="processDoc()">
-      <i class="ti ti-cpu"></i> Process document
-    </button>
   </div>
 
   <div id="processing" style="display:none">
@@ -213,87 +171,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 </div>
 <script>
-// EXIF GPS parser
-function readExifGPS(file){
-  return new Promise(resolve=>{
-    if(!file.type.startsWith('image/')){resolve(null);return;}
-    const reader=new FileReader();
-    reader.onload=e=>{
-      try{
-        const buf=e.target.result;
-        const view=new DataView(buf);
-        if(view.getUint16(0)!==0xFFD8){resolve(null);return;}
-        let offset=2;
-        while(offset<buf.byteLength-2){
-          const marker=view.getUint16(offset);
-          if(marker===0xFFE1){
-            const exifHeader=String.fromCharCode(...new Uint8Array(buf,offset+4,4));
-            if(exifHeader!=='Exif'){resolve(null);return;}
-            const tiffOffset=offset+10;
-            const byteOrder=view.getUint16(tiffOffset);
-            const le=byteOrder===0x4949;
-            const r16=(o)=>le?view.getUint16(tiffOffset+o,true):view.getUint16(tiffOffset+o,false);
-            const r32=(o)=>le?view.getUint32(tiffOffset+o,true):view.getUint32(tiffOffset+o,false);
-            const ifd0=r32(4);
-            const numEntries=r16(ifd0);
-            let gpsIFDOffset=null,dtOrig=null;
-            for(let i=0;i<numEntries;i++){
-              const eo=ifd0+2+i*12;
-              const tag=r16(eo);
-              if(tag===0x8825) gpsIFDOffset=r32(eo+8);
-              if(tag===0x9003){
-                const strOffset=r32(eo+8);
-                let s='';
-                for(let c=0;c<20;c++){const ch=view.getUint8(tiffOffset+strOffset+c);if(ch===0)break;s+=String.fromCharCode(ch);}
-                dtOrig=s;
-              }
-            }
-            if(!gpsIFDOffset){resolve({gps:null,datetime:dtOrig});return;}
-            const gpsEntries=r16(gpsIFDOffset);
-            const rational=(o)=>{const n=r32(o);const d=r32(o+4);return d?n/d:0;};
-            let lat=null,lon=null,latRef='',lonRef='',gpsDate=null;
-            for(let i=0;i<gpsEntries;i++){
-              const eo=gpsIFDOffset+2+i*12;
-              const tag=r16(eo);
-              const valOff=tiffOffset+r32(eo+8);
-              if(tag===0x0001) latRef=String.fromCharCode(view.getUint8(tiffOffset+r32(eo+8)));
-              if(tag===0x0002) lat=rational(valOff)+rational(valOff+8)/60+rational(valOff+16)/3600;
-              if(tag===0x0003) lonRef=String.fromCharCode(view.getUint8(tiffOffset+r32(eo+8)));
-              if(tag===0x0004) lon=rational(valOff)+rational(valOff+8)/60+rational(valOff+16)/3600;
-              if(tag===0x001D){let s='';for(let c=0;c<11;c++){const ch=view.getUint8(tiffOffset+r32(eo+8)+c);if(ch===0)break;s+=String.fromCharCode(ch);}gpsDate=s;}
-            }
-            if(lat===null||lon===null){resolve({gps:null,datetime:dtOrig});return;}
-            if(latRef==='S') lat=-lat;
-            if(lonRef==='W') lon=-lon;
-            resolve({gps:{lat:lat.toFixed(6),lon:lon.toFixed(6)},datetime:dtOrig||gpsDate});
-            return;
-          } else if((marker&0xFF00)===0xFF00){
-            offset+=2+view.getUint16(offset+2);
-          } else break;
-        }
-        resolve({gps:null,datetime:null});
-      }catch(ex){resolve(null);}
-    };
-    reader.readAsArrayBuffer(file.slice(0,131072));
-  });
-}
 
-const DRIVE_FOLDER_ID='1IFwSn0n-LW55AZ00b01-LRG6h0ya8rbP';
-
-async function uploadToDrive(meta){
-  const ep=getEndpoint();
-  if(!ep) throw new Error('No Apps Script URL configured');
-  const formData=new URLSearchParams();
-  formData.append('action','driveUpload');
-  formData.append('folderId',DRIVE_FOLDER_ID);
-  Object.entries(meta).forEach(([k,v])=>formData.append(k,v||''));
-  // no-cors: Apps Script never sends CORS headers, so a normal fetch always shows a
-  // false "blocked" error even though the upload succeeds server-side. no-cors tells
-  // the browser not to attempt reading the response, which stops the false error -
-  // but it also means we genuinely cannot read back success/fileUrl anymore.
-  await fetch(ep,{method:'POST',mode:'no-cors',body:formData});
-  return {sentNoCors:true};
-}
 
 const TAB_COLS={
   "Daily Log":["Date","Day #","Phase","Entry Type","Who On Site","Weather","Temp (F)","Work Start","Work End","Hours Worked","Draw #","Materials Used","Mat Cost ($)","Labor Cost ($)","Vendor/Sub Paid","Lien Waiver","Inspection","Insp Result","Safety Issue","Issue/Delay","Work Completed","Next Steps","Photo Log","Doc Ref","Flag"],
@@ -317,8 +195,8 @@ ROUTING: Site visit/work/meetings/photos -> Daily Log. Payment -> Daily Log+Paym
 DAILY LOG - all 25 cols required, dash for unknown: Date|Day #|Phase|Entry Type|Who On Site|Weather|Temp (F)|Work Start|Work End|Hours Worked|Draw #|Materials Used|Mat Cost ($)|Labor Cost ($)|Vendor/Sub Paid|Lien Waiver|Inspection|Insp Result|Safety Issue|Issue/Delay|Work Completed|Next Steps|Photo Log|Doc Ref|Flag
 Flag=Y if follow-up needed. Lien waiver required before payment - flag CRITICAL if missing.`;
 
-let lastResult=null,lastFile=null,lastFileB64=null,lastFileType=null,lastExif=null,mode='text';
-let pendingClarification=null; // {mode:'text', entry} or {mode:'doc', block}
+let lastResult=null,mode='text';
+let pendingClarification=null; // {entry} - clarification loop for text entries
 const $=id=>document.getElementById(id);
 const show=id=>{$(id).style.display='';};
 const hide=id=>{$(id).style.display='none';};
@@ -395,113 +273,7 @@ function requestTextGeo(){
   );
 }
 
-function onTypeCheck(which){
-  if(which==='workphoto') $('chk-receipt').checked=false;
-  if(which==='receipt') $('chk-workphoto').checked=false;
-  updateFilenamePreview();
-}
-function getFileTypeLabel(){
-  if($('chk-workphoto').checked) return 'work-photo';
-  if($('chk-receipt').checked) return 'receipt';
-  return null;
-}
-function buildFilename(orig){
-  const now=new Date();
-  const mm=String(now.getMonth()+1).padStart(2,'0');
-  const dd=String(now.getDate()).padStart(2,'0');
-  const yy=String(now.getFullYear()).slice(-2);
-  const hh=String(now.getHours()).padStart(2,'0');
-  const min=String(now.getMinutes()).padStart(2,'0');
-  const stamp=`${mm}${dd}${yy}_${hh}${min}`;
-  const vendor=($('vendor-name').value.trim()||'unknown').replace(/[^a-zA-Z0-9 _-]/g,'').replace(/\s+/g,'-').slice(0,30);
-  const typeLabel=getFileTypeLabel()||'doc';
-  const ext=orig.includes('.')?'.'+orig.split('.').pop():'';
-  const base=orig.replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9_-]/g,'-').slice(0,25);
-  return `${stamp}_${vendor}_${typeLabel}_${base}${ext}`;
-}
-function updateFilenamePreview(){
-  if(!lastFile) return;
-  $('filename-text').textContent=buildFilename(lastFile.name);
-  show('filename-preview');
-}
 
-function renderGPSStrip(exif){
-  const strip=$('gps-strip');
-  hide('manual-site-wrap');
-  if(!exif){strip.style.display='none';return;}
-  strip.style.display='flex';
-  if(exif.gps){
-    strip.className='gps-strip gps-ok';
-    const mapsUrl='https://maps.google.com/?q='+exif.gps.lat+','+exif.gps.lon;
-    strip.innerHTML='<i class="ti ti-map-pin" style="font-size:14px;flex-shrink:0;margin-top:1px"></i><div><span style="font-weight:600">GPS confirmed</span> - '+exif.gps.lat+', '+exif.gps.lon+(exif.datetime?' - '+exif.datetime:'')+'<br><a href="'+mapsUrl+'" target="_blank" style="color:var(--green-text);font-size:10px;text-decoration:underline">Verify on map</a></div>';
-  } else {
-    strip.className='gps-strip gps-none';
-    strip.innerHTML='<i class="ti ti-map-pin-off" style="font-size:14px;flex-shrink:0;margin-top:1px"></i><span><strong>No GPS in file.</strong> Enter job site below.</span>';
-    show('manual-site-wrap');
-  }
-}
-
-$('file-input').addEventListener('change',async e=>{
-  const f=e.target.files[0];if(!f) return;
-  lastFile=f;
-  $('drop-zone').innerHTML='<i class="ti ti-file-check" style="font-size:28px;color:var(--green);display:block;margin-bottom:8px"></i><p style="font-size:13px;font-weight:500;color:var(--text);margin:0">'+escH(f.name)+'</p><p style="font-size:11px;color:var(--text2);margin:4px 0 0">'+(f.size/1024).toFixed(0)+' KB - tap to change</p>';
-  show('upload-meta');show('process-doc-btn');
-  hide('gps-strip');hide('manual-site-wrap');hide('filename-preview');
-  lastExif=await readExifGPS(f);
-  renderGPSStrip(lastExif);
-  updateFilenamePreview();
-});
-$('vendor-name').addEventListener('input',updateFilenamePreview);
-
-const dz=$('drop-zone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-dz.addEventListener('drop',e=>{
-  e.preventDefault();dz.classList.remove('drag');
-  const f=e.dataTransfer.files[0];
-  if(f){const dt=new DataTransfer();dt.items.add(f);$('file-input').files=dt.files;$('file-input').dispatchEvent(new Event('change'));}
-});
-
-function validateMeta(){
-  if(!$('vendor-name').value.trim()){alert('Enter vendor / uploader name.');$('vendor-name').focus();return false;}
-  if(!getFileTypeLabel()){alert('Check one box: Work photo or Receipt.');return false;}
-  if(lastFile&&lastFile.type.startsWith('image/')&&lastExif&&!lastExif.gps){
-    if(!$('manual-site').value.trim()){alert('No GPS found. Enter job site location.');$('manual-site').focus();return false;}
-  }
-  return true;
-}
-
-async function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
-
-// Shrinks large phone photos before upload - avoids network timeouts on multi-MB payloads.
-// GPS is already captured separately from the ORIGINAL file via readExifGPS before this
-// ever runs, so losing EXIF on the resized copy costs nothing - location data is preserved
-// independently in lastExif and passed through explicitly at upload time.
-function resizeImageFile(file, maxDim, quality){
-  maxDim=maxDim||1600; quality=quality||0.82;
-  return new Promise(resolve=>{
-    if(!file.type.startsWith('image/')){ resolve(file); return; }
-    const img=new Image();
-    const url=URL.createObjectURL(file);
-    img.onload=()=>{
-      let w=img.width, h=img.height;
-      if(w>maxDim||h>maxDim){
-        const scale=Math.min(maxDim/w, maxDim/h);
-        w=Math.round(w*scale); h=Math.round(h*scale);
-      }
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      canvas.toBlob(blob=>{
-        URL.revokeObjectURL(url);
-        if(!blob){ resolve(file); return; }
-        resolve(new File([blob], file.name, {type:'image/jpeg'}));
-      }, 'image/jpeg', quality);
-    };
-    img.onerror=()=>{ URL.revokeObjectURL(url); resolve(file); };
-    img.src=url;
-  });
-}
 
 function safeParseJSON(text){
   const cleaned=text.replace(/```json|```/g,'').trim();
@@ -544,38 +316,19 @@ async function processText(){
   $('proc-label').textContent='Reading entry...';$('proc-sub').textContent='Extracting fields - Mapping to tabs';
   const geoLine=textGeo?('[Field GPS pin: '+textGeo.lat+', '+textGeo.lon+' (\u00b1'+textGeo.acc+'m), captured '+new Date().toISOString()+']\n\n'):'';
   const fullEntry=geoLine+entry;
-  pendingClarification={mode:'text', entry:fullEntry};
+  pendingClarification={entry:fullEntry};
   try{
     const result=await callClaudeServerSide(fullEntry);
     hide('processing');
     if(result.needsClarification){ renderClarification(result.question); }
-    else { lastResult=result; renderResults(result,false); }
+    else { lastResult=result; renderResults(result); }
   }catch(err){
     hide('processing');show('mode-text');
     alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
   }
 }
 
-async function processDoc(){
-  if(!lastFile) return;if(!validateMeta()) return;
-  hide('mode-doc');show('processing');
-  $('proc-label').textContent='Reading '+lastFile.name+'...';$('proc-sub').textContent='Optimizing image size';
-  try{
-    const isPDF=lastFile.type==='application/pdf';
-    const fileForUpload=isPDF?lastFile:await resizeImageFile(lastFile);
-    $('proc-sub').textContent='Identifying document - Extracting fields';
-    const b64=await toBase64(fileForUpload);lastFileB64=b64;lastFileType=fileForUpload.type||'image/jpeg';
-    const block=isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:lastFileType,data:b64}};
-    pendingClarification={mode:'doc', block:block};
-    const result=await callClaude([{role:'user',content:[block,{type:'text',text:'Process this HFO document and return log entries.'}]}]);
-    hide('processing');
-    if(result.needsClarification){ renderClarification(result.question); }
-    else { lastResult=result; renderResults(result,true); }
-  }catch(err){
-    hide('processing');show('mode-doc');
-    alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
-  }
-}
+
 
 async function writeToSheets(){
   const ep=getEndpoint();if(!ep){alert('No Apps Script URL');return;}
@@ -601,36 +354,13 @@ async function writeToSheets(){
   }
 }
 
-async function saveToDrive(){
-  if(!lastFile||!lastFileB64) return;
-  const btn=$('drive-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Sending to Drive...';
-  try{
-    const vendor=$('vendor-name').value.trim();
-    const filename=buildFilename(lastFile.name);
-    const gps=lastExif&&lastExif.gps?lastExif.gps:null;
-    const manualSite=$('manual-site')?$('manual-site').value.trim():'';
-    await uploadToDrive({filename,mimeType:lastFileType,base64:lastFileB64,vendorName:vendor,fileType:getFileTypeLabel(),gpsLat:gps?gps.lat:'',gpsLon:gps?gps.lon:'',gpsDatetime:lastExif&&lastExif.datetime?lastExif.datetime:'',manualSite,uploadedAt:new Date().toISOString()});
-    btn.innerHTML='<i class="ti ti-circle-check"></i> Sent to Drive';btn.style.background='var(--amber)';
-    const el=$('drive-status');el.style.display='';
-    el.innerHTML='<div class="write-result" style="background:var(--amber-bg);border:1px solid var(--amber-border)"><i class="ti ti-folder-check" style="color:var(--amber-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--amber-text);margin:0 0 2px">Sent to Site_Receipts_Vendors</p><p style="font-size:11px;color:var(--text2);margin:0;font-family:monospace">'+escH(filename)+'</p><p style="font-size:11px;color:var(--text2);margin:6px 0 0">Apps Script can\'t confirm back to the browser - verify the file landed.</p><a href="https://drive.google.com/drive/folders/1IFwSn0n-LW55AZ00b01-LRG6h0ya8rbP" target="_blank" style="font-size:11px;color:var(--blue-text);display:inline-flex;align-items:center;gap:3px;margin-top:6px"><i class="ti ti-external-link" style="font-size:11px"></i> Open Drive folder</a></div></div>';
-  }catch(err){
-    btn.disabled=false;btn.innerHTML='<i class="ti ti-brand-google-drive"></i> Save to Drive';
-    const el=$('drive-status');el.style.display='';
-    el.innerHTML='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">Send failed: '+escH(err.message)+'</span></div>';
-  }
-}
+
 
 function renderWriteResults(data){
   const el=$('write-status');el.style.display='';let h='';
   if(data.sentNoCors){
     h+='<div class="write-result" style="background:var(--amber-bg);border:1px solid var(--amber-border)"><i class="ti ti-send" style="color:var(--amber-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--amber-text);margin:0 0 4px">Sent ('+data.tabCount+' tab'+(data.tabCount!==1?'s':'')+')</p><p style="font-size:11px;color:var(--text2);margin:0">Apps Script can\'t confirm back to the browser - verify the row landed.</p><a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:10px"><i class="ti ti-external-link" style="font-size:13px"></i> Open sheet to verify</a></div></div>';
     const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-circle-check"></i> Sent';btn.style.background='var(--amber)';
-  } else if(data.success&&data.results){
-    const allOk=data.results.every(r=>r.success),col=allOk?'green':'amber';
-    h+='<div class="write-result" style="background:var(--'+col+'-bg);border:1px solid var(--'+col+'-border)"><i class="ti '+(allOk?'ti-circle-check':'ti-alert-circle')+'" style="color:var(--'+col+'-text);font-size:18px;flex-shrink:0"></i><div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--'+col+'-text);margin:0 0 8px">'+(allOk?'Written to sheets':'Partial write')+'</p><div>';
-    data.results.forEach(r=>{h+='<div class="tab-write-row"><span style="color:var(--text2)">'+escH(r.tab)+'</span><span style="color:'+(r.success?'var(--green-text)':'var(--red-text)')+';font-weight:500">'+(r.success?'Row '+(r.row||'added'):''+escH(r.error||'failed'))+'</span></div>';});
-    h+='</div><a href="https://docs.google.com/spreadsheets/d/17-igKyWSRo5Alfhg3j_0XR5aYwn29dVsA0T1PncxcXI" target="_blank" style="font-size:12px;color:var(--blue-text);display:inline-flex;align-items:center;gap:4px;margin-top:10px"><i class="ti ti-external-link" style="font-size:13px"></i> Open sheet</a></div></div>';
-    const btn=$('write-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-circle-check"></i> Written to sheets';btn.style.background='var(--green)';
   } else {
     h+='<div class="write-result" style="background:var(--red-bg);border:1px solid var(--red-border)"><i class="ti ti-alert-triangle" style="color:var(--red-text)"></i><span style="color:var(--red-text)">'+escH(data.error||'Write failed')+'</span></div>';
   }
@@ -644,7 +374,7 @@ function sevStyle(s){
   return {bg:'var(--blue-bg)',border:'var(--blue-border)',text:'var(--blue-text)',icon:'ti-info-circle'};
 }
 
-function renderResults(r,isDocMode){
+function renderResults(r){
   let h='<div class="result-card" style="border-color:var(--amber-border)"><p style="font-size:14px;font-weight:600;color:var(--text);margin:0 0 4px">'+escH(r.summary)+'</p><p style="font-size:11px;color:var(--text3);margin:0">'+(r.tabs||[]).length+' tab'+((r.tabs||[]).length!==1?'s':'')+' affected</p></div>';
   if(r.flags&&r.flags.length){
     [...r.flags].sort((a,b)=>['critical','warning','info'].indexOf(a.severity)-['critical','warning','info'].indexOf(b.severity)).forEach(flag=>{
@@ -660,9 +390,6 @@ function renderResults(r,isDocMode){
     });
   }
   h+='<button class="btn-write" id="write-btn" onclick="writeToSheets()"><i class="ti ti-table-import"></i> Write to Google Sheets</button><div id="write-status" style="display:none"></div>';
-  if(isDocMode){
-    h+='<button class="btn-drive" id="drive-btn" onclick="saveToDrive()"><i class="ti ti-brand-google-drive"></i> Save to Site_Receipts_Vendors</button><div id="drive-status" style="display:none"></div>';
-  }
   h+='<div style="margin-top:0.5rem"><button class="btn-ghost" onclick="resetApp()" style="width:100%">New entry</button></div>';
   $('results').innerHTML=h;show('results');
 }
@@ -689,19 +416,14 @@ async function submitClarification(){
   hide('results');show('processing');
   $('proc-label').textContent='Checking your answer...';$('proc-sub').textContent='Re-reading the entry';
   try{
-    let result;
-    if(ctx.mode==='text'){
-      const combined=ctx.entry+'\n\nAdditional detail: '+answer;
-      pendingClarification={mode:'text', entry:combined};
-      result=await callClaudeServerSide(combined);
-    } else {
-      result=await callClaude([{role:'user',content:[ctx.block,{type:'text',text:'Process this HFO document and return log entries. Additional detail from the field tech: '+answer}]}]);
-    }
+    const combined=ctx.entry+'\n\nAdditional detail: '+answer;
+    pendingClarification={entry:combined};
+    const result=await callClaudeServerSide(combined);
     hide('processing');
     if(result.needsClarification){ renderClarification(result.question); }
-    else { lastResult=result; renderResults(result, ctx.mode==='doc'); }
+    else { lastResult=result; renderResults(result); }
   }catch(err){
-    hide('processing');show(ctx.mode==='text'?'mode-text':'mode-doc');
+    hide('processing');show('mode-text');
     alert('Error: '+(err.rawText?('Unexpected response - '+err.rawText):err.message));
   }
 }
@@ -713,14 +435,10 @@ function copyRow(tabName,idx,btn){
 }
 
 function resetApp(){
-  lastResult=null;lastFile=null;lastFileB64=null;lastFileType=null;lastExif=null;pendingClarification=null;
+  lastResult=null;pendingClarification=null;
   textGeo=null;textGeoAttempted=false;hide('text-gps-strip');
   hide('results');hide('processing');setMode('text');
   $('entry-text').value='';
-  $('drop-zone').innerHTML='<i class="ti ti-cloud-upload" style="font-size:28px;color:var(--text3);display:block;margin-bottom:8px"></i><p style="font-size:13px;font-weight:500;color:var(--text);margin:0 0 4px">Drop or tap to upload</p><p style="font-size:11px;color:var(--text2);margin:0">Invoice - Lien Waiver - Bid - Permit - Receipt - Site Photo</p>';
-  hide('upload-meta');hide('process-doc-btn');$('file-input').value='';
-  $('vendor-name').value='';$('chk-workphoto').checked=false;$('chk-receipt').checked=false;
-  hide('gps-strip');hide('manual-site-wrap');hide('filename-preview');
 }
 </script>
 </body>
